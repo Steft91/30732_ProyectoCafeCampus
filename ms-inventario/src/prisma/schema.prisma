@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // DATABASE_URL = "postgresql://user:pass@localhost:5432/cafe_campus?schema=inventario_schema"
+}
+
+enum TipoMovimiento {
+  ENTRADA   // reposición de stock
+  SALIDA    // venta confirmada
+  AJUSTE    // corrección manual
+}
+
+model Stock {
+  id          String       @id @default(uuid())
+  productoId  String       @unique // referencia lógica al MS Productos
+  cantidad    Int          @default(0)
+  minimo      Int          @default(5)  // alerta de reposición
+  movimientos Movimiento[]
+  actualizadoEn DateTime   @updatedAt
+
+  @@map("stock")
+}
+
+model Movimiento {
+  id         String         @id @default(uuid())
+  stock      Stock          @relation(fields: [stockId], references: [id])
+  stockId    String
+  tipo       TipoMovimiento
+  cantidad   Int
+  motivo     String?        // ej: "Pedido #123", "Reposición proveedor"
+  creadoEn   DateTime       @default(now())
+
+  @@map("movimientos")
+}
