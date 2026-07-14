@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // DATABASE_URL = "postgresql://user:pass@localhost:5432/cafe_campus?schema=pedidos_schema"
+}
+
+enum EstadoPedido {
+  PENDIENTE
+  EN_PREPARACION
+  LISTO_PARA_RETIRAR
+  ENTREGADO
+  CANCELADO
+}
+
+model Pedido {
+  id          String       @id @default(uuid())
+  usuarioId   String       // ID del estudiante (viene del JWT, no FK externa)
+  estado      EstadoPedido @default(PENDIENTE)
+  total       Decimal      @db.Decimal(10, 2)
+  items       ItemPedido[]
+  creadoEn    DateTime     @default(now())
+  actualizadoEn DateTime   @updatedAt
+
+  @@map("pedidos")
+}
+
+model ItemPedido {
+  id          String  @id @default(uuid())
+  pedido      Pedido  @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  pedidoId    String
+  productoId  String  // referencia lógica, no FK (microservicio separado)
+  nombre      String  // snapshot del nombre al momento del pedido
+  precio      Decimal @db.Decimal(10, 2) // snapshot del precio
+  cantidad    Int
+
+  @@map("items_pedido")
+}
