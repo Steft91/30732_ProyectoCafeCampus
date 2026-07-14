@@ -1,0 +1,113 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cafe-campus-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: cafe_campus
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - cafe_campus_pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: cafe-campus-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  ms-productos:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npx prisma generate --schema src/prisma/schema.prisma && npm run start:dev"
+    volumes:
+      - ./ms-productos:/app
+    environment:
+      PORT: 3001
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/cafe_campus?schema=productos_schema
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  ms-inventario:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npx prisma generate --schema src/prisma/schema.prisma && npm run start:dev"
+    volumes:
+      - ./ms-inventario:/app
+    environment:
+      PORT: 3003
+      TCP_PORT: 4003
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/cafe_campus?schema=inventario_schema
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "3003:3003"
+      - "4003:4003"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  ms-pedidos:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npx prisma generate --schema src/prisma/schema.prisma && npm run start:dev"
+    volumes:
+      - ./ms-pedidos:/app
+    environment:
+      PORT: 3002
+      TCP_PORT: 4002
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/cafe_campus?schema=pedidos_schema
+      MS_INVENTARIO_URL: http://ms-inventario:3003
+      MS_INVENTARIO_TCP_HOST: ms-inventario
+      MS_INVENTARIO_TCP_PORT: 4003
+    ports:
+      - "3002:3002"
+      - "4002:4002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ms-inventario:
+        condition: service_started
+
+  gateway:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run start:dev"
+    volumes:
+      - ./gateway:/app
+    environment:
+      PORT: 3000
+      JWT_SECRET: cafe_campus_jwt_secret_cambiar_en_produccion
+      MS_PRODUCTOS_URL: http://ms-productos:3001
+      MS_PEDIDOS_URL: http://ms-pedidos:3002
+      MS_INVENTARIO_URL: http://ms-inventario:3003
+      MS_PEDIDOS_TCP_HOST: ms-pedidos
+      MS_PEDIDOS_TCP_PORT: 4002
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      FRONTEND_URL: http://localhost:4200
+    ports:
+      - "3000:3000"
+    depends_on:
+      ms-productos:
+        condition: service_started
+      ms-pedidos:
+        condition: service_started
+      redis:
+        condition: service_started
+
+volumes:
+  cafe_campus_pgdata:
