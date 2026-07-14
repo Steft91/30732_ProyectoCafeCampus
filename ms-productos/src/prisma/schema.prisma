@@ -1,0 +1,35 @@
+// MS Productos - Schema Prisma
+// Schema separado para mantener independencia entre microservicios
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // DATABASE_URL = "postgresql://user:pass@localhost:5432/cafe_campus?schema=productos_schema"
+}
+
+model Producto {
+  id           String    @id @default(uuid())
+  nombre       String
+  descripcion  String?
+  precio       Decimal   @db.Decimal(10, 2)
+  categoria    Categoria @relation(fields: [categoriaId], references: [id])
+  categoriaId  String
+  imagen       String?   // URL o nombre del archivo
+  disponible   Boolean   @default(true)
+  creadoEn     DateTime  @default(now())
+  actualizadoEn DateTime @updatedAt
+
+  @@map("productos")
+}
+
+model Categoria {
+  id        String     @id @default(uuid())
+  nombre    String     @unique
+  productos Producto[]
+
+  @@map("categorias")
+}
