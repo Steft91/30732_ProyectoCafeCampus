@@ -1,0 +1,85 @@
+@startuml arquitectura-avance1
+' ============================================================
+'  Cafe Campus - Arquitectura Avance 1
+'  Acoplamiento temporal y latencia (sincrono vs asincrono)
+'  Render: https://www.plantuml.com/plantuml  (o extension PlantUML en VS Code)
+' ============================================================
+
+title Cafe Campus - Arquitectura Avance 1\nCamino sincrono (TCP) vs camino asincrono (Redis)
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam ArrowThickness 1.2
+skinparam component {
+  BorderColor #34495E
+  BackgroundColor #ECF0F1
+}
+skinparam database {
+  BorderColor #34495E
+  BackgroundColor #FDF6E3
+}
+skinparam queue {
+  BorderColor #34495E
+  BackgroundColor #FDEBD0
+}
+
+actor "Cliente\n(Postman / curl)" as cliente
+
+component "API Gateway\nHTTP :3000 (/api)\nJWT + Guards por rol" as gw
+
+package "Microservicios de dominio" {
+  component "MS Productos\nHTTP :3001" as prod
+  component "MS Pedidos\nHTTP :3002\nTCP :4002" as ped
+  component "MS Inventario\nHTTP :3003\nTCP :4003\nRedis subscriber" as inv
+}
+
+database "PostgreSQL :5432\n(productos_schema)\n(pedidos_schema)\n(inventario_schema)" as pg
+queue "Redis :6379\n(pub/sub)" as redis
+
+' ---------- Entrada ----------
+cliente --> gw : HTTP REST
+
+' ---------- Trafico de dominio (HTTP / axios) ----------
+gw ..> prod : <color:#2E86C1>HTTP dominio</color>
+gw ..> ped  : <color:#2E86C1>HTTP dominio</color>
+gw ..> inv  : <color:#2E86C1>HTTP dominio</color>
+ped ..> inv : <color:#2E86C1>HTTP validar/descontar stock</color>
+
+' ---------- Persistencia ----------
+prod --> pg
+ped  --> pg
+inv  --> pg
+
+' ---------- Camino SINCRONO (benchmark) : TCP encadenado ----------
+gw  -[#C0392B,bold]-> ped : <color:#C0392B><b>1) TCP benchmark.sync</b></color>
+ped -[#C0392B,bold]-> inv : <color:#C0392B><b>2) TCP benchmark.stock-check</b></color>
+note right of inv #FADBD8
+  SINCRONO (GET /api/benchmark/sync)
+  Gateway espera a Pedidos, y
+  Pedidos espera a Inventario.
+  Las latencias se ACUMULAN (~104 ms).
+  Si Inventario cae => toda la
+  cadena falla con 503 (acoplamiento temporal).
+end note
+
+' ---------- Camino ASINCRONO (benchmark) : Redis pub/sub ----------
+gw    -[#1E8449,bold]-> redis : <color:#1E8449><b>emit('pedido.creado.async')</b></color>
+redis -[#1E8449,bold]-> inv   : <color:#1E8449><b>@EventPattern (consume)</b></color>
+note left of redis #D5F5E3
+  ASINCRONO (GET /api/benchmark/async)
+  El Gateway responde apenas el
+  broker acepta el evento (~1.5 ms).
+  El consumidor procesa aparte.
+  Si Inventario cae => la peticion
+  se sigue aceptando (desacople temporal).
+end note
+
+legend right
+  |= Estilo |= Significado |
+  | <color:#2E86C1>. . . azul punteado</color> | Trafico de dominio HTTP (axios) |
+  | <color:#C0392B>__ rojo solido__</color> | Camino SINCRONO benchmark (TCP) |
+  | <color:#1E8449>__ verde solido__</color> | Camino ASINCRONO benchmark (Redis) |
+endlegend
+
+@enduml
