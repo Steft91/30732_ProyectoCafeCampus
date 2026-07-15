@@ -2,10 +2,10 @@
 
 ## Tabla de latencias (200 peticiones, `benchmark.js`)
 
-| Camino | Transporte | Promedio (ms) | p95 (ms) | Máx (ms) | Errores |
-|---|---|---:|---:|---:|---:|
-| Síncrono | TCP encadenado | **104.89** | 106.00 | 162.00 | 0 |
-| Asíncrono | Redis pub/sub | **1.67** | 2.00 | 70.00 | 0 |
+| Camino    | Transporte     | Promedio (ms) | p95 (ms) | Máx (ms) | Errores |
+| --------- | -------------- | ------------: | -------: | -------: | ------: |
+| Síncrono  | TCP encadenado |    **104.89** |   106.00 |   162.00 |       0 |
+| Asíncrono | Redis pub/sub  |      **1.67** |     2.00 |    70.00 |       0 |
 
 Fuente: `docs/avance1-benchmark-sync.txt`, `docs/avance1-benchmark-async.txt`.
 
@@ -26,7 +26,7 @@ El promedio de **104.89 ms** coincide con la suma de los retardos artificiales (
 
 ## Por qué el camino asíncrono es ~63× más rápido en responder
 
-`GET /api/benchmark/async` publica un evento en Redis (`emit('pedido.creado.async')`) y responde **apenas el broker acepta el mensaje**, sin esperar a que MS Inventario lo procese. El consumidor (`@EventPattern`) trabaja **después**, por su cuenta (con su propio `BENCHMARK_ASYNC_DELAY_MS = 120`, que **no** cuenta para el tiempo de respuesta del emisor). Por eso el promedio cae a **1.56 ms**: solo se mide el tiempo de publicar, no el de procesar.
+`GET /api/benchmark/async` publica un evento en Redis (`emit('pedido.creado.async')`) y responde **apenas el broker acepta el mensaje**, sin esperar a que MS Inventario lo procese. El consumidor (`@EventPattern`) trabaja después, por su cuenta (con su propio `BENCHMARK_ASYNC_DELAY_MS = 120`, que no cuenta para el tiempo de respuesta del emisor). Por eso el promedio cae a **1.56 ms**: solo se mide el tiempo de publicar, no el de procesar.
 
 ## Qué es el ACOPLAMIENTO TEMPORAL (prueba de caída)
 
@@ -35,18 +35,23 @@ para que la operación tenga éxito. Se demostró apagando **MS Inventario** con
 (evidencia: `docs/avance1-caida-servicio.txt`):
 
 - **Camino síncrono → FALLA.** `curl .../benchmark/sync` responde:
-  ```json
-  { "message": "Camino síncrono no disponible: MS Pedidos o MS Inventario no respondió",
-    "error": "Service Unavailable", "statusCode": 503 }
-  ```
-  Falla porque Gateway, Pedidos e Inventario deben coexistir para completar la cadena.
+
+    ```json
+    {
+        "message": "Camino síncrono no disponible: MS Pedidos o MS Inventario no respondió",
+        "error": "Service Unavailable",
+        "statusCode": 503
+    }
+    ```
+
+    Falla porque Gateway, Pedidos e Inventario deben coexistir para completar la cadena.
 
 - **Camino asíncrono → SE ACEPTA igual.** `curl .../benchmark/async` responde
   `"aceptado": true` con `duracionMs ≈ 1`, aunque MS Inventario esté detenido.
   El Gateway publica el evento y no espera una respuesta del consumidor, por lo que
   la disponibilidad inmediata de MS Inventario no condiciona la respuesta HTTP del emisor.
 
-  Sin embargo, al utilizar Redis Pub/Sub, el evento no es persistente. Si no existe un   consumidor activo al momento de la publicación, no se garantiza su procesamiento posterior.   La prueba demuestra desacoplamiento temporal del emisor, pero no entrega garantizada.
+    Sin embargo, al utilizar Redis Pub/Sub, el evento no es persistente. Si no existe un consumidor activo al momento de la publicación, no se garantiza su procesamiento posterior. La prueba demuestra desacoplamiento temporal del emisor, pero no entrega garantizada.
 
 ## Conclusión
 
