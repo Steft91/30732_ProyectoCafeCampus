@@ -137,7 +137,7 @@ sequenceDiagram
     participant Inventario as MS Inventario
     Cliente->>Gateway: GET /api/benchmark/async
     Gateway->>Redis: publish pedido.creado.async
-    Gateway-->>Cliente: aceptado (~1.5 ms)
+    Gateway-->>Cliente: aceptado (~1.7 ms)
     Redis-->>Inventario: evento
     Inventario->>Inventario: procesa sin bloquear al Gateway
 ```
@@ -147,10 +147,7 @@ sequenceDiagram
 - **Kanban:** ver [`TABLERO_KANBAN.md`](TABLERO_KANBAN.md) y el reparto en
   [`docs/planificacion-avance1/01-roles-y-kanban.md`](docs/planificacion-avance1/01-roles-y-kanban.md)
   (captura en `docs/avance1-kanban.png`).
-- **Ramificación:** **GitHub Flow** — `main` protegida, ramas `feat/…`, `chore/…`, `docs/…`, PRs
-  revisados por otro integrante, y un **tag por avance**. Plan detallado (propiedad por directorio
-  para evitar choques) en
-  [`docs/planificacion-avance1/02-plan-de-commits.md`](docs/planificacion-avance1/02-plan-de-commits.md).
+- **Ramificación:** **GitHub Flow** — `main` como rama principal y ramas `feat/…`, `chore/…` y `docs/…` para separar funcionalidades, configuración y documentación. Las ramas se integran mediante Pull Requests y se utiliza un **tag por avance**.
 - **Commits semánticos:** Conventional Commits `tipo(alcance): descripción`. Ejemplos:
     ```
     feat(tcp): agregar handler tcp de verificacion de stock
@@ -162,15 +159,15 @@ sequenceDiagram
 ## Patrones y principios aplicados
 
 Resumen (detalle y justificación en
-[`docs/planificacion-avance1/03-patrones-y-principios.md`](docs/planificacion-avance1/03-patrones-y-principios.md)):
+[`docs/planificacion-avance1/02-patrones-y-principios.md`](docs/planificacion-avance1/02-patrones-y-principios.md)):
 
-| Patrón / Principio                                                            | ¿Framework o equipo?                  |
-| ----------------------------------------------------------------------------- | ------------------------------------- |
-| API Gateway, Proxy                                                            | Diseñado por el equipo                |
-| Publisher/Subscriber (Redis), Request/Response (TCP)                          | Equipo (sobre transportes de Nest)    |
-| DTO + `ValidationPipe`, Inyección de dependencias, Módulos, Exception Filters | Aporta NestJS, usados deliberadamente |
-| SRP, DIP, aislamiento de datos por `schema`                                   | Diseño del equipo                     |
-
+| Patrón / Principio | ¿Framework o equipo? |
+|---|---|
+| API Gateway y Proxy | Diseñados por el equipo |
+| Publisher/Subscriber (Redis) y Request/Response (TCP) | Equipo, utilizando transportes de NestJS |
+| DTO, `ValidationPipe`, inyección de dependencias y módulos | Proporcionados por NestJS y utilizados deliberadamente |
+| Excepciones HTTP y manejo controlado de errores | Framework y uso deliberado del equipo |
+| SRP, separación de responsabilidades y aislamiento de datos por `schema` | Diseño del equipo |
 ---
 
 ## Avance 1 — Acoplamiento temporal y latencia · `tag v1-avance1`
@@ -194,41 +191,35 @@ node benchmark.js http://localhost:3000/api/benchmark/async 200 > docs/avance1-b
 
 | Camino          | Promedio (ms) | p95 (ms) | Máx (ms) | Errores |
 | --------------- | ------------: | -------: | -------: | ------: |
-| Síncrono TCP    |    **103.76** |   105.00 |   162.00 |       0 |
-| Asíncrono Redis |      **1.56** |     2.00 |    65.00 |       0 |
+| Síncrono TCP    |    **104.89** |   106.00 |   162.00 |       0 |
+| Asíncrono Redis |      **1.67** |     2.00 |    70.00 |       0 |
 
 ### Acoplamiento temporal (prueba de caída)
 
 Con el stack arriba, se apaga **MS Inventario** (Ctrl+C) y se repiten las peticiones
 (evidencia en `docs/avance1-caida-servicio.txt`):
 
-- **Síncrono → falla** con `503 Service Unavailable`: la cadena Gateway→Pedidos→Inventario
-  requiere que todos estén vivos a la vez.
-- **Asíncrono → se acepta igual** (`"aceptado": true`, ~1 ms): el Gateway solo publica en Redis;
-  el consumidor procesará después.
+- **Síncrono → falla** con `503 Service Unavailable`: la cadena Gateway→Pedidos→Inventario requiere que todos estén vivos a la vez.
+- **Asíncrono → se acepta igual** (`"aceptado": true`, ~1 ms): el Gateway publica el evento en Redis y responde sin esperar una confirmación del consumidor. Esto demuestra un menor acoplamiento temporal desde la perspectiva del emisor.
 
-**Falla del camino síncrono al apagar MS Inventario**
+**Resultados del benchmark del camino síncrono**
 
-![Falla del camino síncrono](docs/sync.png)
+![Resultados del camino síncrono](docs/sync.png)
 
-**Aceptación del camino asíncrono con Redis**
+**Resultados del benchmark del camino asíncrono**
 
-![Aceptación del camino asíncrono](docs/async.png)
+![Resultados del camino asíncrono](docs/async.png)
 
 ### Análisis
 
-En el camino **síncrono**, cada salto **bloquea** al anterior hasta recibir respuesta, por lo que
-los tiempos **se suman**: el promedio de **103.76 ms** coincide con los retardos artificiales de
-Pedidos (40 ms) e Inventario (60 ms) más el costo de dos saltos TCP. Además hay **acoplamiento
-temporal**: al caer Inventario, la petición falla con **503** porque los tres servicios deben
-coexistir para completar la operación.
+En el camino **síncrono**, cada salto espera la respuesta del siguiente antes de continuar, por lo que los tiempos de procesamiento se acumulan. El promedio medido fue de **104.89 ms**, valor coherente con los retardos artificiales de MS Pedidos (40 ms) y MS Inventario (60 ms), además del costo de comunicación entre procesos. La prueba de caída también evidenció **acoplamiento temporal**: al detener MS Inventario, la cadena no pudo completarse y el Gateway respondió con un error **503 Service Unavailable**.
 
-En el camino **asíncrono**, el Gateway publica un evento en Redis y responde apenas el broker
-acepta el mensaje (**1.56 ms** de promedio); el consumidor procesa después, con su propio retardo
-que **no** cuenta para la respuesta del emisor. Por eso, al apagar el consumidor, la petición se
-sigue aceptando: el emisor está **desacoplado en el tiempo** del consumidor (a cambio de
-consistencia eventual). Análisis ampliado en
-[`docs/planificacion-avance1/04-analisis-latencia-acoplamiento.md`](docs/planificacion-avance1/04-analisis-latencia-acoplamiento.md).
+En el camino **asíncrono**, el Gateway publica un evento mediante Redis Pub/Sub y responde sin esperar que MS Inventario complete su procesamiento. Por esta razón, el promedio de respuesta fue de **1.67 ms**. Incluso con el consumidor detenido, el Gateway aceptó la solicitud y respondió correctamente, evidenciando un menor acoplamiento temporal desde la perspectiva del emisor.
+
+Sin embargo, Redis Pub/Sub utiliza mensajería no persistente. Por ello, esta implementación demuestra desacoplamiento temporal y reducción del tiempo de respuesta, pero no garantiza que un evento publicado mientras el consumidor está detenido sea procesado posteriormente.
+
+Análisis ampliado en
+[`docs/planificacion-avance1/03-analisis-latencia-acoplamiento.md`](docs/planificacion-avance1/03-analisis-latencia-acoplamiento.md).
 
 ---
 
