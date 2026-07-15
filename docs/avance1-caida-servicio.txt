@@ -1,0 +1,36 @@
+"PRUEBA DE CAIDA DE SERVICIO - ACOPLAMIENTO TEMPORAL
+===================================================
+
+Escenario: MS Inventario detenido
+
+1. CAMINO SINCRONO
+Gateway -> MS Pedidos -> MS Inventario
+
+HTTP/1.1 503 Service Unavailable
+X-Powered-By: Express
+Access-Control-Allow-Origin: http://localhost:4200
+Vary: Origin
+Content-Type: application/json; charset=utf-8
+Content-Length: 133
+ETag: W/"85-btu9IzrU0U5egasLTuD+v2ABssQ"
+Date: Wed, 15 Jul 2026 02:17:11 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"message":"Camino síncrono no disponible: MS Pedidos o MS Inventario no respondió","error":"Service Unavailable","statusCode":503}
+
+2. CAMINO ASINCRONO
+Gateway -> Redis
+
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Access-Control-Allow-Origin: http://localhost:4200
+Vary: Origin
+Content-Type: application/json; charset=utf-8
+Content-Length: 266
+ETag: W/"10a-ZvsBC2wZr+2xXVL45RGzC+S2v5A"
+Date: Wed, 15 Jul 2026 02:17:11 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"camino":"asincrono-redis","descripcion":"Gateway publica evento Redis; el consumidor procesa sin bloquear","aceptado":true,"duracionMs":1,"evento":{"pedidoId":"bench-1784081831984","productoId":"demo-cappuccino","cantidad":2,"creadoEn":"2026-07-15T02:17:11.984Z"}}
