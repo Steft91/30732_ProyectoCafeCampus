@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package productos;
+
+service ProductosGrpcService {
+  rpc ObtenerProducto (ObtenerProductoRequest) returns (ProductoResponse);
+}
+
+message ObtenerProductoRequest {
+  string id = 1;
+}
+
+message ProductoResponse {
+  string id = 1;
+  string nombre = 2;
+  string descripcion = 3;
+  double precio = 4;
+  string categoriaId = 5;
+  string categoriaNombre = 6;
+  bool disponible = 7;
+}
