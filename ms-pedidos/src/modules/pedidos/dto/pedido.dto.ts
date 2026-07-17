@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsPositive,
   IsString,
   Min,
@@ -17,13 +18,14 @@ export class ItemPedidoDto {
   productoId: string;
 
   @IsString()
-  @IsNotEmpty()
-  nombre: string; // snapshot del nombre al crear el pedido
+  @IsOptional()
+  nombre?: string; // compatibilidad: el backend usa el snapshot obtenido por gRPC
 
   @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
+  @IsOptional()
   @Type(() => Number)
-  precio: number; // snapshot del precio
+  precio?: number; // compatibilidad: el backend usa el snapshot obtenido por gRPC
 
   @IsNumber()
   @Min(1)
