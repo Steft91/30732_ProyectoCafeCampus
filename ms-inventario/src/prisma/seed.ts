@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
 
 const prisma = new PrismaClient();
+const productosUrl = process.env.MS_PRODUCTOS_URL ?? 'http://localhost:3001';
 
 /**
  * Este seed consulta los productos del MS Productos para obtener sus IDs
@@ -15,10 +16,10 @@ async function main() {
   let productos: { id: string; nombre: string }[] = [];
 
   try {
-    const response = await axios.get('http://localhost:3001/productos');
+    const response = await axios.get(`${productosUrl}/productos`);
     productos = response.data;
   } catch {
-    console.error('❌ No se pudo conectar al MS Productos. ¿Está corriendo en el puerto 3001?');
+    console.error(`❌ No se pudo conectar al MS Productos en ${productosUrl}.`);
     process.exit(1);
   }
 
