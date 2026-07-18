@@ -7,7 +7,7 @@
 | Síncrono  | TCP encadenado |    **104.89** |   106.00 |   162.00 |       0 |
 | Asíncrono | Redis pub/sub  |      **1.67** |     2.00 |    70.00 |       0 |
 
-Fuente: `docs/avance1-benchmark-sync.txt`, `docs/avance1-benchmark-async.txt`.
+Fuente: `docs/avance1-evidencias/avance1-benchmark-sync.txt`, `docs/avance1-evidencias/avance1-benchmark-async.txt`.
 
 ## Por qué se ACUMULA la latencia en el camino síncrono
 
@@ -32,7 +32,7 @@ El promedio de **104.89 ms** coincide con la suma de los retardos artificiales (
 
 **Acoplamiento temporal** = todos los servicios de una cadena deben estar **vivos al mismo tiempo**
 para que la operación tenga éxito. Se demostró apagando **MS Inventario** con el resto activo
-(evidencia: `docs/avance1-caida-servicio.txt`):
+(evidencia: `docs/avance1-evidencias/avance1-caida-servicio.txt`):
 
 - **Camino síncrono → FALLA.** `curl .../benchmark/sync` responde:
 
