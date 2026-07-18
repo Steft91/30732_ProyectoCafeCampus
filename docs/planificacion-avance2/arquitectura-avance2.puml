@@ -1,0 +1,103 @@
+@startuml arquitectura-avance2
+' ============================================================
+'  Cafe Campus - Arquitectura Avance 2
+'  gRPC (contrato) + segundo transporte asincrono (RabbitMQ)
+'  sobre el TCP/Redis del Avance 1 (que se conservan)
+'  Render: https://www.plantuml.com/plantuml  (o extension PlantUML en VS Code)
+' ============================================================
+
+title Cafe Campus - Arquitectura Avance 2\ngRPC (Pedidos -> Productos) + RabbitMQ (Pedidos -> Inventario)\nsobre el TCP/Redis del Avance 1
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam ArrowThickness 1.2
+skinparam component {
+  BorderColor #34495E
+  BackgroundColor #ECF0F1
+}
+skinparam database {
+  BorderColor #34495E
+  BackgroundColor #FDF6E3
+}
+skinparam queue {
+  BorderColor #34495E
+  BackgroundColor #FDEBD0
+}
+skinparam artifact {
+  BorderColor #34495E
+  BackgroundColor #EBF5FB
+}
+
+actor "Cliente\n(Postman / curl)" as cliente
+
+component "API Gateway\nHTTP :3000 (/api)\nJWT + Guards por rol" as gw
+
+package "Microservicios de dominio" {
+  component "MS Productos\nHTTP :3001\ngRPC servidor :50051" as prod
+  component "MS Pedidos\nHTTP :3002\nTCP :4002\ncliente gRPC + publisher RabbitMQ" as ped
+  component "MS Inventario\nHTTP :3003\nTCP :4003\nRedis subscriber\nconsumer RabbitMQ" as inv
+}
+
+artifact "proto/productos.proto\n(contrato gRPC compartido)" as proto
+
+database "PostgreSQL :5432\n(productos_schema)\n(pedidos_schema)\n(inventario_schema)" as pg
+queue "Redis :6379\n(pub/sub, Avance 1)" as redis
+queue "RabbitMQ :5672\ncola durable\ncafe_campus_pedidos" as rabbit
+
+' ---------- Contrato compartido ----------
+proto .[#7D3C98,dashed].> prod : <color:#7D3C98>define servidor</color>
+proto .[#7D3C98,dashed].> ped  : <color:#7D3C98>define cliente</color>
+
+' ---------- Entrada ----------
+cliente --> gw : HTTP REST
+
+' ---------- Trafico de dominio (HTTP / axios) ----------
+gw ..> prod : <color:#2E86C1>HTTP dominio</color>
+gw ..> ped  : <color:#2E86C1>HTTP dominio (POST /pedidos)</color>
+gw ..> inv  : <color:#2E86C1>HTTP dominio</color>
+ped ..> inv : <color:#2E86C1>HTTP validar/descontar stock</color>
+
+' ---------- Persistencia ----------
+prod --> pg
+ped  --> pg
+inv  --> pg
+
+' ---------- NUEVO Avance 2: gRPC (sincrono, contrato) ----------
+ped -[#7D3C98,bold]-> prod : <color:#7D3C98><b>gRPC ObtenerProducto(id)</b></color>
+note right of prod #E8DAEF
+  gRPC (POST /api/pedidos)
+  Pedidos consulta nombre/precio REALES
+  al servidor de Productos por contrato .proto.
+  Si el producto no existe => RpcException NOT_FOUND
+  se traduce a HTTP 422 (try/catch) sin tumbar el servicio.
+end note
+
+' ---------- NUEVO Avance 2: RabbitMQ (asincrono, cola durable) ----------
+ped   -[#B9770E,bold]-> rabbit : <color:#B9770E><b>emit('pedido.creado.rabbitmq')</b></color>
+rabbit -[#B9770E,bold]-> inv   : <color:#B9770E><b>@EventPattern (consume)</b></color>
+note left of rabbit #FDEBD0
+  RabbitMQ (segundo transporte asincrono)
+  Cola DURABLE: a diferencia de Redis pub/sub,
+  el mensaje persiste aunque el consumidor
+  este caido y se entrega al reconectar.
+end note
+
+' ---------- Avance 1 conservado: TCP encadenado (benchmark) ----------
+gw  -[#C0392B]-> ped : <color:#C0392B>1) TCP benchmark.sync (Avance 1)</color>
+ped -[#C0392B]-> inv : <color:#C0392B>2) TCP benchmark.stock-check (Avance 1)</color>
+
+' ---------- Avance 1 conservado: Redis pub/sub (benchmark) ----------
+gw    -[#1E8449]-> redis : <color:#1E8449>emit('pedido.creado.async') (Avance 1)</color>
+redis -[#1E8449]-> inv   : <color:#1E8449>@EventPattern (Avance 1)</color>
+
+legend right
+  |= Estilo |= Significado |
+  | <color:#2E86C1>. . . azul punteado</color> | Trafico de dominio HTTP (axios) |
+  | <color:#7D3C98>__ morado solido__</color> | **NUEVO** gRPC sincrono con contrato (Avance 2) |
+  | <color:#B9770E>__ ambar solido__</color> | **NUEVO** RabbitMQ asincrono, cola durable (Avance 2) |
+  | <color:#C0392B>rojo</color> | TCP benchmark sincrono (Avance 1, conservado) |
+  | <color:#1E8449>verde</color> | Redis benchmark asincrono (Avance 1, conservado) |
+endlegend
+
+@enduml
