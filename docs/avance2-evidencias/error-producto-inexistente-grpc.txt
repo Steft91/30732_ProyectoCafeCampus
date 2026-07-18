@@ -1,0 +1,12 @@
+=== Prueba de error controlado gRPC ===
+
+Endpoint: POST http://localhost:3000/api/pedidos
+Producto utilizado: producto-inexistente
+Cantidad: 1
+HTTP status: 422
+
+=== Respuesta ===
+{
+  "statusCode": 422,
+  "message": "Error gRPC al consultar producto: 5 NOT_FOUND: Producto con id producto-inexistente no encontrado"
+}
