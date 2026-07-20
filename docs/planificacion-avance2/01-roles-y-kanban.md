@@ -20,8 +20,6 @@ la integración de las ramas. El único archivo compartido (`docker-compose.yml`
 > **contrato `.proto`** lo congela Marcos en la Fase 0 antes de que arranquen las ramas de servicio,
 > por lo que las tres ramas se fusionan en cualquier orden sin conflictos.
 
-> **Nota sobre el reparto (equilibrio de aportes):** los **tres** integrantes tienen aportes de **código** en la Fase 1: Marcos el servidor gRPC de `ms-productos` (coherente con ser dueño del contrato `.proto`), Stefany todo el lado Pedidos —cliente gRPC + publisher RabbitMQ— además de la documentación y evidencias (criterio C5), y Mateo el consumer RabbitMQ de `ms-inventario`. Cada rama se integra mediante Pull Request para mantener la trazabilidad de los cambios.
-
 ## Reparto de tarjetas del `TABLERO_KANBAN.md` (etiqueta `avance-2`)
 
 | Tarjeta Kanban (Avance 2)                                                     | Responsable                                                      | Rama donde se resuelve                              |
