@@ -53,11 +53,6 @@ fix_ — antes de volver a etiquetar `v2-avance2`. Detalle de hallazgos y priori
 | **Marcos Escobar** | Fixer · Planificación  | Documenta y sube el plan de correcciones (`04-correcciones.md`, este archivo, `05-plan-de-commits.md`) a `main`; no toca código de servicio en esta fase                  | commit directo a `main` (documentación) |
 | **Stefany Díaz**   | Fixer · Implementación | Ejecuta las correcciones de código (P1–P3 de `04-correcciones.md`) sobre `ms-pedidos`, `ms-inventario` y `docker-compose.yml`; commits aún **en progreso**, no fusionados | `fix/correcciones-g3-avance1`           |
 
-> Equivalencia con el flujo Kanban existente: una tarjeta _fixer_ se comporta como cualquier
-> tarjeta `feat/`/`fix/` de GitHub Flow — vive en su propia rama, se integra por Pull Request y
-> queda en la columna **En progreso** de `TABLERO_KANBAN.md` hasta que las correcciones de Stefany
-> estén listas para revisión.
-
 ## Cómo se conecta con GitHub Flow
 
 - `main` se utiliza como rama estable de integración; cada tarjeta se trabaja en una rama independiente.
