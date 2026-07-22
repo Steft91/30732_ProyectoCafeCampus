@@ -6,7 +6,6 @@ import {
   HttpStatus,
   OnModuleInit,
 } from '@nestjs/common';
-import { join } from 'path';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { CrearPedidoDto, ActualizarEstadoDto } from '../dto/pedido.dto';
 import axios, { AxiosError } from 'axios';
@@ -52,7 +51,7 @@ export class PedidosService implements OnModuleInit {
       transport: Transport.GRPC,
       options: {
         package: 'productos',
-        protoPath: join(__dirname, '../../../../../proto/productos.proto'),
+        protoPath: process.env.PROTO_PATH ?? '/proto/productos.proto',
         url: process.env.GRPC_PRODUCTOS_URL ?? 'localhost:50051',
       },
     }) as unknown as ClientGrpc;

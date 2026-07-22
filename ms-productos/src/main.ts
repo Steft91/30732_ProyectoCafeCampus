@@ -9,13 +9,12 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
-
     const port = process.env.PORT ?? 3001;
     app.connectMicroservice({
         transport: Transport.GRPC,
         options: {
             package: "productos",
-            protoPath: join(__dirname, "../../proto/productos.proto"),
+            protoPath: process.env.PROTO_PATH ?? "/proto/productos.proto",
             url: `0.0.0.0:${process.env.GRPC_PORT ?? 50051}`,
         },
     });
