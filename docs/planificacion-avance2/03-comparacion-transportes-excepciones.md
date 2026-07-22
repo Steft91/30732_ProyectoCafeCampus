@@ -24,7 +24,7 @@ perder un evento es tolerable (el emisor no espera y el mensaje es efímero). **
 mensajes que el ofrecido por Redis Pub/Sub. La cola durable mejora la capacidad
 de conservar el flujo de mensajería ante interrupciones, aunque la garantía final
 depende de la configuración del broker, de la persistencia del mensaje y de las
-confirmaciones utilizadas., a cambio de más infraestructura y algo más de latencia.
+confirmaciones utilizadas, a cambio de más infraestructura y algo más de latencia.
 En resumen: **síncrono con contrato → gRPC**; **asíncrono con garantía de entrega → RabbitMQ**;
 los transportes del Avance 1 se conservan como línea base comparativa.
 
@@ -66,6 +66,8 @@ Evidencias del flujo exitoso:
   `obtenerSnapshotsProductos`) envuelve la llamada en **`try/catch`** y traduce el error a
   `HttpException(..., 422 UNPROCESSABLE_ENTITY)`. Resultado: el cliente recibe un `422` claro y
   **ningún servicio se cae**.
+  Además, `ms-pedidos` y `ms-inventario` registran un filtro RPC global para traducir excepciones
+  inesperadas a semántica compatible con microservicios.
   Evidencia: [`error-producto-inexistente-grpc.txt`](../avance2-evidencias/error-producto-inexistente-grpc.txt)
   y [`avance2-error-producto-inexistente-grpc.png`](../avance2-evidencias/avance2-error-producto-inexistente-grpc.png).
 
@@ -80,7 +82,7 @@ Evidencias del flujo exitoso:
   registra (`console.error`) pero **el pedido ya persistido no se invalida** (la compensación queda
   como mejora futura). La consulta gRPC utiliza un timeout de 3000 ms y la publicación RabbitMQ uno de
 1500 ms. Las operaciones HTTP hacia Inventario gestionan los errores mediante
-`try/catch` y `.catch()`.
+  `try/catch` y `.catch()`.
 
 **Estrategia consistente:** cada transporte captura su propio tipo de error en el borde del servicio
 y lo traduce a la abstracción del llamante (gRPC→HTTP 422, Axios→HTTP 422, RMQ→log + best-effort),
@@ -89,7 +91,7 @@ de modo que **un fallo aguas abajo nunca derriba el proceso** que lo invoca.
 ## Conclusión
 
 El Avance 2 demuestra que los cuatro transportes cumplen roles complementarios: gRPC aporta un canal
-síncrono **tipado por contrato** para datos autoritativos del servidor, y RRabbitMQ aporta un canal asíncrono basado en cola y con mayor capacidad de
+síncrono **tipado por contrato** para datos autoritativos del servidor, y RabbitMQ aporta un canal asíncrono basado en cola y con mayor capacidad de
 retención y control de consumo que Redis Pub/Sub. El manejo de excepciones —traducción de `RpcException` a HTTP `422` mediante
 `try/catch`— evidencia, con un error real y reproducible (producto inexistente), que un fallo
 controlado **no interrumpe la disponibilidad** de los microservicios.

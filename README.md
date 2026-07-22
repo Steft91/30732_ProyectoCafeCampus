@@ -53,6 +53,15 @@ curl http://localhost:3000/api/benchmark/sync
 curl http://localhost:3000/api/benchmark/async
 ```
 
+Ese compose ya ejecuta `prisma migrate deploy` en `ms-productos`,
+`ms-inventario` y `ms-pedidos`, así que las tablas se crean al levantar el stack.
+Si vas a probar el flujo real de pedidos sobre una base limpia, siembra primero:
+
+```bash
+docker compose exec ms-productos npm run seed
+docker compose exec ms-inventario npm run seed
+```
+
 ### Opción B — Local (sin Docker)
 
 Levantar PostgreSQL y Redis, ejecutar migraciones y arrancar en orden:
@@ -253,6 +262,10 @@ Cuando se consulta un producto inexistente, MS Productos devuelve una
 `try/catch` y lo traduce a una respuesta HTTP `422 Unprocessable Entity`, sin
 detener ninguno de los servicios.
 
+Además, `ms-pedidos` y `ms-inventario` registran un filtro RPC global para que
+cualquier excepción HTTP inesperada dentro de handlers microservicio se traduzca
+a semántica RPC en vez de romper el flujo.
+
 ### Comparación de transportes
 
 | Transporte | Tipo | Patrón | Uso |
@@ -280,6 +293,52 @@ Documentación ampliada:
 ### Arquitectura del Avance 2
 
 ![Arquitectura Avance 2](docs/planificacion-avance2/arquitectura-avance2.png)
+
+### Cómo probar el flujo del Avance 2
+
+1. Levanta el stack:
+
+   ```bash
+   docker compose up -d
+   ```
+
+2. Si la base está limpia, siembra datos:
+
+   ```bash
+   docker compose exec ms-productos npm run seed
+   docker compose exec ms-inventario npm run seed
+   ```
+
+3. Obtén un `productoId` válido:
+
+   ```bash
+   curl http://localhost:3001/productos
+   ```
+
+4. Crea un pedido contra `ms-pedidos`:
+
+   ```bash
+   curl -X POST http://localhost:3002/pedidos \
+     -H "Content-Type: application/json" \
+     -d '{"usuarioId":"1","items":[{"productoId":"PEGA_AQUI_UN_ID_REAL","cantidad":1}]}'
+   ```
+
+5. Observa el consumo RabbitMQ en inventario:
+
+   ```bash
+   docker compose logs -f ms-inventario
+   ```
+
+6. Prueba el error controlado con un producto inexistente:
+
+   ```bash
+   curl -X POST http://localhost:3002/pedidos \
+     -H "Content-Type: application/json" \
+     -d '{"usuarioId":"1","items":[{"productoId":"producto-inexistente","cantidad":1}]}'
+   ```
+
+   Debe responder `422 Unprocessable Entity` y mostrar el mensaje traducido
+   por gRPC, sin tumbar los servicios.
 
 
 ## Avance 3 — Seguridad, observabilidad e integración (FINAL) · `tag v3-final`

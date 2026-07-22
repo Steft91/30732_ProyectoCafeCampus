@@ -13,7 +13,7 @@ Enriquecer la comunicación del MVP con **dos temas del curso** sin romper lo en
 
 1. **gRPC** entre `ms-pedidos` (cliente) y `ms-productos` (servidor), con contrato `.proto` en el monorepo.
 2. **RabbitMQ** como **segundo transporte asíncrono** (cola durable), distinto a Redis Pub/Sub.
-3. **Manejo de excepciones** consistente en la capa de servicios para los nuevos caminos (error gRPC controlado que no tumba el servicio).
+3. **Manejo de excepciones** consistente en la capa de servicios para los nuevos caminos, con filtros RPC globales y errores traducidos sin tumbar el servicio.
 
 El camino síncrono **TCP** y el asíncrono **Redis** del Avance 1 **se conservan** como evidencia previa.
 
@@ -33,7 +33,8 @@ El camino síncrono **TCP** y el asíncrono **Redis** del Avance 1 **se conserva
 | gRPC (Tema 7) | `ms-pedidos` → `ms-productos` | Pedidos necesita `nombre`/`precio` **reales del servidor** antes de crear un pedido, no del cliente. |
 | Segundo transporte | RabbitMQ (`amqp`) | Cola configurada como durable, con un flujo de consumo más controlado y mayor
 capacidad de retención que Redis Pub/Sub. |
-| Error controlado | Producto inexistente por gRPC | `RpcException(NOT_FOUND)` → HTTP `422` con `try/catch`, sin tumbar el servicio. |
+| Error controlado | Producto inexistente por gRPC | `RpcException(NOT_FOUND)` en servidor + `try/catch` en cliente + filtro RPC global para mantener la semántica sin tumbar el servicio. |
+| Arranque en Docker | `prisma migrate deploy` antes de `start:dev` | Las tres apps que usan Prisma crean el esquema automáticamente al levantar el compose. |
 | Evidencia | `curl`, logs y capturas en `docs/avance2-evidencias/` | La rúbrica exige pruebas visibles en el repositorio. |
 
 ## Cómo regenerar el diagrama
@@ -57,5 +58,5 @@ gRPC, la obtención del snapshot del producto y la publicación del evento
 RabbitMQ. Mateo implementó en MS Inventario el consumidor RabbitMQ.
 
 Después de integrar las tres ramas de servicio, Stefany ejecutó las pruebas,
-generó las evidencias, actualizó la documentación y realizará el cierre del
+generó las evidencias, actualizó la documentación y realizó el cierre del
 avance con el tag `v2-avance2`.

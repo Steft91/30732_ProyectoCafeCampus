@@ -50,6 +50,17 @@ Carpeta: [`avance2-evidencias/`](avance2-evidencias/)
 - [`avance2-error-producto-inexistente-grpc.png`](avance2-evidencias/avance2-error-producto-inexistente-grpc.png):
   captura del error gRPC controlado.
 
+Carpeta: [`avance2-evidencias/fix/`](avance2-evidencias/fix/)
+
+- [`fix-compose-ps.txt`](avance2-evidencias/fix/fix-compose-ps.txt) y `fix-compose-ps.png`:
+  estado del stack luego de aplicar las correcciones.
+- [`fix-grpc-error-controlado.txt`](avance2-evidencias/fix/fix-grpc-error-controlado.txt) y `fix-grpc-error-controlado.png`:
+  prueba de producto inexistente con respuesta HTTP 422.
+- [`fix-pedido-exitoso-grpc-rabbitmq.txt`](avance2-evidencias/fix/fix-pedido-exitoso-grpc-rabbitmq.txt) y `fix-pedido-exitoso-grpc-rabbitmq.png`:
+  pedido exitoso con consulta gRPC y publicación RabbitMQ.
+- [`fix-rabbitmq-inventario.txt`](avance2-evidencias/fix/fix-rabbitmq-inventario.txt) y `fix-rabbitmq-inventario.png`:
+  consumo del evento RabbitMQ por MS Inventario.
+
 ### Planificación
 
 Carpeta: [`planificacion-avance2/`](planificacion-avance2/)
