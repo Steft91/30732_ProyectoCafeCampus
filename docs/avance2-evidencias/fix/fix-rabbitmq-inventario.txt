@@ -1,0 +1,10 @@
+=== Consumo RabbitMQ en Inventario ===
+
+Evento recibido:
+pedido=520445cf-ad8c-41dc-9bd9-c9eee575ca56, usuario=1, total=2.9, items=1
+
+Log:
+ms-inventario-1  | [Nest] 346  - 07/22/2026, 12:07:39 AM     LOG [PedidosRabbitmqController] Evento RabbitMQ recibido: pedido=520445cf-ad8c-41dc-9bd9-c9eee575ca56, usuario=1, total=2.9, items=1
+
+Conclusión:
+RabbitMQ quedó consumiendo correctamente el evento publicado por MS Pedidos.

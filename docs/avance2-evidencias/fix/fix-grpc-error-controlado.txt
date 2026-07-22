@@ -1,0 +1,27 @@
+=== Prueba de error controlado gRPC ===
+
+Endpoint:
+POST http://localhost:3002/pedidos
+
+Request:
+{
+  "usuarioId": "1",
+  "items": [
+    {
+      "productoId": "producto-inexistente",
+      "cantidad": 1
+    }
+  ]
+}
+
+HTTP status:
+422 Unprocessable Entity
+
+Respuesta:
+{
+  "statusCode": 422,
+  "message": "Error gRPC al consultar producto: 5 NOT_FOUND: Producto con id producto-inexistente no encontrado"
+}
+
+Conclusión:
+La excepción gRPC se traduce correctamente a HTTP 422 sin tumbar el servicio.

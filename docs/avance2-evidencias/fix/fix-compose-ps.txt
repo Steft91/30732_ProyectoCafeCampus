@@ -1,0 +1,16 @@
+=== Stack verificado ===
+
+Comando:
+docker compose ps
+
+Resultado:
+- gateway: Up
+- ms-productos: Up
+- ms-pedidos: Up
+- ms-inventario: Up
+- postgres: Up (healthy)
+- redis: Up
+- rabbitmq: Up
+
+Conclusión:
+El stack completo quedó arriba después de aplicar las correcciones y recrear los contenedores.

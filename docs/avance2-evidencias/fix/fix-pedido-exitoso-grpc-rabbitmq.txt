@@ -1,0 +1,38 @@
+=== Prueba de pedido exitoso ===
+
+Endpoint:
+POST http://localhost:3002/pedidos
+
+Request:
+{
+  "usuarioId": "1",
+  "items": [
+    {
+      "productoId": "d99915ce-3b52-45b1-ade6-f7860c7dc616",
+      "cantidad": 1
+    }
+  ]
+}
+
+HTTP response:
+{
+  "id": "520445cf-ad8c-41dc-9bd9-c9eee575ca56",
+  "usuarioId": "1",
+  "estado": "PENDIENTE",
+  "total": "2.9",
+  "creadoEn": "2026-07-22T00:07:39.349Z",
+  "actualizadoEn": "2026-07-22T00:07:39.349Z",
+  "items": [
+    {
+      "id": "148da78d-c237-4a94-a337-b4a29b8887e4",
+      "pedidoId": "520445cf-ad8c-41dc-9bd9-c9eee575ca56",
+      "productoId": "d99915ce-3b52-45b1-ade6-f7860c7dc616",
+      "nombre": "Tostada con aguacate",
+      "precio": "2.9",
+      "cantidad": 1
+    }
+  ]
+}
+
+Conclusión:
+La consulta gRPC, la validación HTTP y la creación del pedido funcionan de extremo a extremo.
