@@ -35,7 +35,7 @@ services:
   ms-productos:
     image: node:20-alpine
     working_dir: /app
-    command: sh -c "apk add --no-cache openssl && npm ci && npx prisma generate --schema src/prisma/schema.prisma && npm run start:dev"
+    command: sh -c "apk add --no-cache openssl && npm ci && npx prisma generate --schema src/prisma/schema.prisma && npx prisma migrate deploy --schema src/prisma/schema.prisma && npm run start:dev"
     volumes:
       - ./ms-productos:/app
       - ./proto:/proto:ro
@@ -53,7 +53,7 @@ services:
   ms-inventario:
     image: node:20-alpine
     working_dir: /app
-    command: sh -c "apk add --no-cache openssl && npm ci && npx prisma generate --schema src/prisma/schema.prisma && npm run start:dev"
+    command: sh -c "apk add --no-cache openssl && npm ci && npx prisma generate --schema src/prisma/schema.prisma && npx prisma migrate deploy --schema src/prisma/schema.prisma && npm run start:dev"
     volumes:
       - ./ms-inventario:/app
     environment:
@@ -78,7 +78,7 @@ services:
   ms-pedidos:
     image: node:20-alpine
     working_dir: /app
-    command: sh -c "apk add --no-cache openssl && npm ci && npx prisma generate --schema src/prisma/schema.prisma && npm run start:dev"
+    command: sh -c "apk add --no-cache openssl && npm ci && npx prisma generate --schema src/prisma/schema.prisma && npx prisma migrate deploy --schema src/prisma/schema.prisma && npm run start:dev"
     volumes:
       - ./ms-pedidos:/app
       - ./proto:/proto:ro

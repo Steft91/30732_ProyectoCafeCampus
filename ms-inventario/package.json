@@ -5,10 +5,10 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "build": "nest build",
-    "seed": "ts-node src/prisma/seed.ts"
+        "seed": "prisma generate --schema src/prisma/schema.prisma && ts-node src/prisma/seed.ts"
   },
   "prisma": {
-    "seed": "ts-node src/prisma/seed.ts"
+    "seed": "prisma generate --schema src/prisma/schema.prisma && ts-node src/prisma/seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
