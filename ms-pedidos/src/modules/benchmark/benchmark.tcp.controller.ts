@@ -1,6 +1,17 @@
-import { Controller, ServiceUnavailableException } from '@nestjs/common';
-import { ClientProxy, ClientProxyFactory, MessagePattern, Payload, Transport } from '@nestjs/microservices';
+import { Controller } from '@nestjs/common';
+import {
+  ClientProxy,
+  ClientProxyFactory,
+  MessagePattern,
+  Payload,
+  RpcException,
+  Transport,
+} from '@nestjs/microservices';
 import { firstValueFrom, timeout } from 'rxjs';
+
+const GrpcStatus = {
+  UNAVAILABLE: 14,
+} as const;
 
 type BenchmarkPayload = {
   productoId: string;
@@ -38,7 +49,10 @@ export class BenchmarkTcpController {
         inventario,
       };
     } catch {
-      throw new ServiceUnavailableException('MS Inventario no respondió por TCP');
+      throw new RpcException({
+        code: GrpcStatus.UNAVAILABLE,
+        message: 'MS Inventario no respondió por TCP',
+      });
     }
   }
 
