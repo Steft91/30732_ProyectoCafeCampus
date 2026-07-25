@@ -1,4 +1,4 @@
-# Plan de commits semánticos para fixes del Avance 2
+# Commits semánticos para fixes del Avance 2
 
 Los cambios de corrección se trabajan en la rama `fix-avance-2` para recuperar
 trazabilidad y separar cada responsabilidad en commits pequeños.

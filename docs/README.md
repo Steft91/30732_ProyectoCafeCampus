@@ -72,3 +72,18 @@ Contiene:
 - comparación entre TCP, Redis, gRPC y RabbitMQ;
 - manejo de excepciones;
 - diagrama actualizado de arquitectura.
+
+---
+
+## Avance 3 — Fixes de arranque
+
+Carpeta: [`planificacion-avance3/fix/`](planificacion-avance3/fix/)
+
+Contiene la trazabilidad de las correcciones aplicadas después de la
+retroalimentación del Avance 2 para arrancar el Avance 3 con el repositorio
+final alineado:
+
+- [`correcciones-avance2.md`](planificacion-avance3/fix/correcciones-avance2.md):
+  hallazgos corregidos y estado.
+- [`commits-semanticos-fix.md`](planificacion-avance3/fix/commits-semanticos-fix.md):
+  secuencia de commits semánticos de la rama `fix-avance-2`.

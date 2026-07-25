@@ -84,22 +84,20 @@ flujo de cierre del Avance 2.
 - Se embebió la captura del Kanban del Avance 2.
 
 ### `docs/planificacion-avance2/README.md`
-- Se agregaron enlaces a `04-correcciones.md` y `05-plan-de-commits.md`.
 - Se ajustó la decisión técnica para mencionar `RpcExceptionFilter` real.
 
 ### `docs/planificacion-avance2/01-roles-y-kanban.md`
-- Se corrigió el texto de la rama fixer para reflejar el trabajo en `fix-avance-2`.
-- Se eliminó la frase de commits "en progreso, no fusionados".
+- Se retiró la sección provisional de correcciones para dejar Avance 2 solo con su planificación propia.
 
 ### `docs/planificacion-avance2/03-comparacion-transportes-excepciones.md`
 - Se reemplazó la afirmación genérica del filtro por rutas y transportes reales.
 - Se documentó la compensación de stock a `CANCELADO`.
 
-### `docs/planificacion-avance2/04-correcciones.md`
-- Se creó el documento de correcciones solicitadas y su estado.
+### `docs/planificacion-avance3/fix/correcciones-avance2.md`
+- Se creó/reubicó el documento de correcciones solicitadas y su estado.
 
-### `docs/planificacion-avance2/05-plan-de-commits.md`
-- Se creó el plan de commits semánticos usado para cerrar la rama de fix.
+### `docs/planificacion-avance3/fix/commits-semanticos-fix.md`
+- Se creó/reubicó el plan de commits semánticos usado para cerrar la rama de fix.
 
 ## 6. Evidencias fix existentes
 

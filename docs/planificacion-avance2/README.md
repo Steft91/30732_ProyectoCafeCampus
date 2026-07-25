@@ -24,8 +24,6 @@ El camino síncrono **TCP** y el asíncrono **Redis** del Avance 1 **se conserva
 | [`01-roles-y-kanban.md`](01-roles-y-kanban.md) | Roles, propiedad por directorio y reparto de tarjetas Kanban del Avance 2. |
 | [`02-patrones-y-principios.md`](02-patrones-y-principios.md) | Patrones/principios aplicados (framework vs equipo) — criterio C4. |
 | [`03-comparacion-transportes-excepciones.md`](03-comparacion-transportes-excepciones.md) | Comparación de los 4 transportes y estrategia de excepciones — criterios C2/C3. |
-| [`04-correcciones.md`](04-correcciones.md) | Correcciones derivadas de la retroalimentación de los avances 1 y 2. |
-| [`05-plan-de-commits.md`](05-plan-de-commits.md) | Plan de commits semánticos para cerrar las correcciones en rama de fix. |
 
 
 ## Decisión técnica
