@@ -208,10 +208,31 @@ node benchmark.js http://localhost:3000/api/benchmark/sync 200 > docs/avance1-ev
 node benchmark.js http://localhost:3000/api/benchmark/async 200 > docs/avance1-evidencias/avance1-benchmark-async.txt
 ```
 
+Para repetir la medición sin retardos artificiales:
+
+```bash
+BENCHMARK_PEDIDOS_DELAY_MS=0 BENCHMARK_INVENTARIO_DELAY_MS=0 docker compose up -d --force-recreate ms-pedidos ms-inventario gateway
+node benchmark.js http://localhost:3000/api/benchmark/sync 200 > docs/avance1-evidencias/avance1-benchmark-sync-zero-delay.txt
+node benchmark.js http://localhost:3000/api/benchmark/async 200 > docs/avance1-evidencias/avance1-benchmark-async-zero-delay.txt
+```
+
 | Camino          | Promedio (ms) | p95 (ms) | Máx (ms) | Errores |
 | --------------- | ------------: | -------: | -------: | ------: |
 | Síncrono TCP    |    **104.89** |   106.00 |   162.00 |       0 |
 | Asíncrono Redis |      **1.67** |     2.00 |    70.00 |       0 |
+
+Resultados adicionales con `BENCHMARK_PEDIDOS_DELAY_MS=0` y
+`BENCHMARK_INVENTARIO_DELAY_MS=0`:
+
+| Camino          | Promedio (ms) | p95 (ms) | Máx (ms) | Errores |
+| --------------- | ------------: | -------: | -------: | ------: |
+| Síncrono TCP    |      **6.85** |     9.00 |    67.00 |       0 |
+| Asíncrono Redis |      **3.10** |     4.00 |    75.00 |       0 |
+
+La comparación completa sin delays se documenta en
+[`docs/planificacion-avance1/03-analisis-latencia-acoplamiento.md`](docs/planificacion-avance1/03-analisis-latencia-acoplamiento.md)
+y queda respaldada por `docs/avance1-evidencias/avance1-benchmark-sync-zero-delay.txt`
+y `docs/avance1-evidencias/avance1-benchmark-async-zero-delay.txt`.
 
 ### Acoplamiento temporal (prueba de caída)
 

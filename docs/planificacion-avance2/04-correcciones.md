@@ -20,12 +20,12 @@ afirmaciones que no existan en código.
 | Links a `04-correcciones.md` y `05-plan-de-commits.md` estaban rotos. | Crear ambos documentos y enlazarlos desde el índice del Avance 2. |
 | Evidencias y Kanban estaban enlazados pero no embebidos. | Embeber capturas en README con sintaxis `![]`. |
 | Fecha del tag `v2-avance2` quedó desactualizada tras retag. | Sincronizar la sección de tags con el estado evaluado: commit `c2c861e`, 2026-07-21. |
-| Tabla de latencia mantenía typo `1.56 ms`. | Corregir a `1.67 ms`. |
+| Tabla de latencia mantenía typo `1.56 ms`. | Corregido a `1.67 ms`. |
 
 ## Prioridad operativa
 
 | Hallazgo | Acción |
 |---|---|
 | Redis y RabbitMQ no tenían `healthcheck`. | Agregar healthchecks y cambiar dependencias consumidoras a `service_healthy`. |
-| Faltaban filas de benchmark con delays en cero. | Agregar evidencia o sección comparativa con `BENCHMARK_PEDIDOS_DELAY_MS=0` y `BENCHMARK_INVENTARIO_DELAY_MS=0`. |
+| Faltaban filas de benchmark con delays en cero. | Agregada comparación con evidencia cruda para `BENCHMARK_PEDIDOS_DELAY_MS=0` y `BENCHMARK_INVENTARIO_DELAY_MS=0`. |
 | Descuento de stock sigue como best-effort con `.catch(console.error)`. | Mantener como decisión documentada para Avance 3 o crear compensación/evento de fallo. |

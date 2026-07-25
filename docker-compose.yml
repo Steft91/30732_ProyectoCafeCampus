@@ -69,6 +69,8 @@ services:
     environment:
       PORT: 3003
       TCP_PORT: 4003
+      BENCHMARK_INVENTARIO_DELAY_MS: ${BENCHMARK_INVENTARIO_DELAY_MS:-60}
+      BENCHMARK_ASYNC_DELAY_MS: ${BENCHMARK_ASYNC_DELAY_MS:-120}
       DATABASE_URL: postgresql://postgres:password@postgres:5432/cafe_campus?schema=inventario_schema
       MS_PRODUCTOS_URL: http://ms-productos:3001
       REDIS_HOST: redis
@@ -95,6 +97,7 @@ services:
     environment:
       PORT: 3002
       TCP_PORT: 4002
+      BENCHMARK_PEDIDOS_DELAY_MS: ${BENCHMARK_PEDIDOS_DELAY_MS:-40}
       DATABASE_URL: postgresql://postgres:password@postgres:5432/cafe_campus?schema=pedidos_schema
       MS_INVENTARIO_URL: http://ms-inventario:3003
       MS_INVENTARIO_TCP_HOST: ms-inventario

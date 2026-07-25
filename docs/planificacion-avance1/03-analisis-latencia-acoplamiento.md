@@ -26,7 +26,34 @@ El promedio de **104.89 ms** coincide con la suma de los retardos artificiales (
 
 ## Por qué el camino asíncrono es ~63× más rápido en responder
 
-`GET /api/benchmark/async` publica un evento en Redis (`emit('pedido.creado.async')`) y responde **apenas el broker acepta el mensaje**, sin esperar a que MS Inventario lo procese. El consumidor (`@EventPattern`) trabaja después, por su cuenta (con su propio `BENCHMARK_ASYNC_DELAY_MS = 120`, que no cuenta para el tiempo de respuesta del emisor). Por eso el promedio cae a **1.56 ms**: solo se mide el tiempo de publicar, no el de procesar.
+`GET /api/benchmark/async` publica un evento en Redis (`emit('pedido.creado.async')`) y responde **apenas el broker acepta el mensaje**, sin esperar a que MS Inventario lo procese. El consumidor (`@EventPattern`) trabaja después, por su cuenta (con su propio `BENCHMARK_ASYNC_DELAY_MS = 120`, que no cuenta para el tiempo de respuesta del emisor). Por eso el promedio cae a **1.67 ms**: solo se mide el tiempo de publicar, no el de procesar.
+
+## Comparación sin retardos artificiales
+
+La retroalimentación del Avance 1 señaló que los 104.89 ms del camino síncrono estaban dominados por
+retardos artificiales (`40 ms` en Pedidos + `60 ms` en Inventario). Para aislar el costo neto de
+comunicación, el Compose permite reiniciar el benchmark con delays en cero:
+
+```bash
+BENCHMARK_PEDIDOS_DELAY_MS=0 BENCHMARK_INVENTARIO_DELAY_MS=0 docker compose up -d --force-recreate ms-pedidos ms-inventario gateway
+node benchmark.js http://localhost:3000/api/benchmark/sync 200 > docs/avance1-evidencias/avance1-benchmark-sync-zero-delay.txt
+node benchmark.js http://localhost:3000/api/benchmark/async 200 > docs/avance1-evidencias/avance1-benchmark-async-zero-delay.txt
+```
+
+| Escenario | Camino | Promedio (ms) | p95 (ms) | Máx (ms) | Errores |
+|---|---|---:|---:|---:|---:|
+| Con delays artificiales | TCP encadenado | **104.89** | 106.00 | 162.00 | 0 |
+| Con delays artificiales | Redis pub/sub | **1.67** | 2.00 | 70.00 | 0 |
+| Delays en cero | TCP encadenado | **6.85** | 9.00 | 67.00 | 0 |
+| Delays en cero | Redis pub/sub | **3.10** | 4.00 | 75.00 | 0 |
+
+Esta segunda medición separa el costo de transporte del tiempo artificial de procesamiento. Si el
+camino síncrono sigue siendo mayor que el asíncrono, la diferencia ya no se explica por `setTimeout`,
+sino por la cadena de esperas Gateway -> Pedidos -> Inventario.
+
+Evidencias crudas:
+`docs/avance1-evidencias/avance1-benchmark-sync-zero-delay.txt` y
+`docs/avance1-evidencias/avance1-benchmark-async-zero-delay.txt`.
 
 ## Qué es el ACOPLAMIENTO TEMPORAL (prueba de caída)
 
