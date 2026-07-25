@@ -23,6 +23,11 @@ services:
     restart: unless-stopped
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -31,6 +36,11 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   ms-productos:
     image: node:20-alpine
@@ -71,9 +81,9 @@ services:
       postgres:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
 
   ms-pedidos:
     image: node:20-alpine
@@ -102,7 +112,7 @@ services:
       ms-productos:
         condition: service_started
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
 
   gateway:
     image: node:20-alpine
@@ -129,7 +139,7 @@ services:
       ms-pedidos:
         condition: service_started
       redis:
-        condition: service_started
+        condition: service_healthy
 
 volumes:
   cafe_campus_pgdata:
