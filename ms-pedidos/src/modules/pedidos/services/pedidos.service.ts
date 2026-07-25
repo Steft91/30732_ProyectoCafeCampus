@@ -133,13 +133,16 @@ export class PedidosService implements OnModuleInit {
       console.error('Error al publicar evento RabbitMQ:', err);
     });
 
-    // 6. Descontar stock en MS Inventario (fire and forget con manejo de error)
-    await this.descontarStock(pedido.id, items).catch((err) => {
-      console.error('Error al descontar stock:', err);
-      // El pedido ya fue creado; se podría implementar compensación aquí
-    });
+    let pedidoResultado = pedido;
 
-    return pedido;
+    // 6. Descontar stock en MS Inventario y compensar si la operación posterior falla
+    try {
+      await this.descontarStock(pedido.id, items);
+    } catch (err) {
+      pedidoResultado = await this.compensarPedidoPorFalloStock(pedido.id, err);
+    }
+
+    return pedidoResultado;
   }
 
   async actualizarEstado(id: string, dto: ActualizarEstadoDto) {
@@ -245,6 +248,21 @@ export class PedidosService implements OnModuleInit {
     await axios.post(`${MS_INVENTARIO_URL}/inventario/descontar`, {
       pedidoId,
       items: items.map(({ productoId, cantidad }) => ({ productoId, cantidad })),
+    });
+  }
+
+  private async compensarPedidoPorFalloStock(pedidoId: string, error: unknown) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'No se pudo descontar stock después de crear el pedido';
+
+    console.error(`Compensando pedido ${pedidoId} por fallo de stock: ${message}`);
+
+    return this.prisma.pedido.update({
+      where: { id: pedidoId },
+      data: { estado: 'CANCELADO' },
+      include: { items: true },
     });
   }
 }

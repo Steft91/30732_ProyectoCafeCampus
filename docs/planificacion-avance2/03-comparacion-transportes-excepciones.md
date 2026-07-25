@@ -80,15 +80,16 @@ Evidencias del flujo exitoso:
 - **Fallo de stock (HTTP).** `validarStock()` captura el `AxiosError` de `ms-inventario` y re-lanza
   `HttpException 422` con el mensaje del servicio.
 
-- **Publicación RabbitMQ *best-effort*.** `publicarPedidoCreadoRabbitMQ()` y `descontarStock()` van
-  con `.catch()`: si el broker o Inventario fallan **después** de crear el pedido, el error se
-  registra (`console.error`) pero **el pedido ya persistido no se invalida** (la compensación queda
-  como mejora futura). La consulta gRPC utiliza un timeout de 3000 ms y la publicación RabbitMQ uno de
-1500 ms. Las operaciones HTTP hacia Inventario gestionan los errores mediante
-  `try/catch` y `.catch()`.
+- **Publicación RabbitMQ *best-effort* y compensación de stock.** `publicarPedidoCreadoRabbitMQ()`
+  mantiene semántica best-effort para no bloquear la respuesta si el evento de evidencia falla.
+  En cambio, si `descontarStock()` falla **después** de crear el pedido, MS Pedidos ejecuta
+  `compensarPedidoPorFalloStock()` y marca el pedido como `CANCELADO`. La consulta gRPC utiliza un
+  timeout de 3000 ms y la publicación RabbitMQ uno de 1500 ms. Las operaciones HTTP hacia Inventario
+  gestionan errores mediante `try/catch`.
 
 **Estrategia consistente:** cada transporte captura su propio tipo de error en el borde del servicio
-y lo traduce a la abstracción del llamante (gRPC→HTTP 422, Axios→HTTP 422, RMQ→log + best-effort),
+y lo traduce a la abstracción del llamante (gRPC→HTTP 422, Axios→HTTP 422, RMQ→log + best-effort,
+fallo posterior de stock→pedido `CANCELADO`),
 de modo que **un fallo aguas abajo nunca derriba el proceso** que lo invoca.
 
 ## Conclusión

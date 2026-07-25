@@ -10,7 +10,8 @@ trazabilidad y separar cada responsabilidad en commits pequeños.
 | 3 | `docs(readme): embed avance2 evidence and sync tag date` | Embebe evidencias, Kanban y sincroniza metadata del tag. |
 | 4 | `fix(compose): add broker healthchecks` | Añade healthchecks de Redis/RabbitMQ y dependencias `service_healthy`. |
 | 5 | `docs(avance1): add zero-delay latency comparison` | Corrige el typo de latencia y documenta benchmark con delays en cero. |
-| 6 | `docs(fix): document exact avance2 changes` | Incluye el reporte exacto de cambios en la carpeta de evidencias `fix`. |
+| 6 | `fix(pedidos): compensate failed stock discount` | Marca el pedido como `CANCELADO` si falla el descuento posterior de stock. |
+| 7 | `docs(fix): document exact avance2 changes` | Incluye el reporte exacto de cambios en la carpeta de evidencias `fix`. |
 
 ## Verificación antes de merge
 

@@ -28,4 +28,4 @@ afirmaciones que no existan en código.
 |---|---|
 | Redis y RabbitMQ no tenían `healthcheck`. | Agregar healthchecks y cambiar dependencias consumidoras a `service_healthy`. |
 | Faltaban filas de benchmark con delays en cero. | Agregada comparación con evidencia cruda para `BENCHMARK_PEDIDOS_DELAY_MS=0` y `BENCHMARK_INVENTARIO_DELAY_MS=0`. |
-| Descuento de stock sigue como best-effort con `.catch(console.error)`. | Mantener como decisión documentada para Avance 3 o crear compensación/evento de fallo. |
+| Descuento de stock seguía como best-effort con `.catch(console.error)`. | Implementada compensación: si el descuento posterior falla, el pedido se marca `CANCELADO`. |
