@@ -326,7 +326,7 @@ Documentación ampliada:
 
 ![Kanban Avance 2](docs/avance2-evidencias/avance2-kanban.png)
 
-**Evidencias fix post-retroalimentacion**
+**Evidencias fix post-retroalimentación**
 
 ![Stack Docker luego de fixes](docs/avance2-evidencias/fix/fix-compose-ps.png)
 ![Error controlado validado luego de fixes](docs/avance2-evidencias/fix/fix-grpc-error-controlado.png)
@@ -388,6 +388,24 @@ Documentación ampliada:
 
 _Pendiente._ Login que emite JWT y Guard que protege rutas (200 con token / 401 sin token / 403 por
 rol), observabilidad con Sentry, integración final y sección de defensa.
+
+### Evidencias post-retroalimentación para iniciar Avance 3
+
+Estas capturas documentan que el repositorio quedó estable luego de aplicar la
+retroalimentación del Avance 2. No reemplazan las evidencias finales del Avance
+3; sirven como punto de partida verificable.
+
+- [Trazabilidad de correcciones](docs/avance3-evidencias/fix/correcciones-avance2.md)
+
+![Rama y estado Git luego de fixes](docs/avance3-evidencias/fix/fix-rama-avance3.png)
+
+![Stack Docker luego de fixes](docs/avance3-evidencias/fix/fix-docker-healthy.png)
+
+![Pedido exitoso luego de fixes](docs/avance3-evidencias/fix/fix-pedido-exitoso.png)
+
+![Error controlado luego de fixes](docs/avance3-evidencias/fix/fix-error-controlado.png)
+
+![Consumo RabbitMQ luego de fixes](docs/avance3-evidencias/fix/fix-rabbitmq-consumo.png)
 
 ## Defensa
 

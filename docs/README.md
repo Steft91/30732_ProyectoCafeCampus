@@ -89,3 +89,13 @@ final alineado:
 
 - [`correcciones-avance2.md`](avance3-evidencias/fix/correcciones-avance2.md):
   hallazgos corregidos y estado.
+- [`fix-rama-avance3.png`](avance3-evidencias/fix/fix-rama-avance3.png):
+  rama de trabajo y estado Git limpio luego de los fixes.
+- [`fix-docker-healthy.png`](avance3-evidencias/fix/fix-docker-healthy.png):
+  stack Docker levantado después de aplicar las correcciones.
+- [`fix-pedido-exitoso.png`](avance3-evidencias/fix/fix-pedido-exitoso.png):
+  pedido exitoso validado como punto de partida del Avance 3.
+- [`fix-error-controlado.png`](avance3-evidencias/fix/fix-error-controlado.png):
+  error controlado por producto inexistente.
+- [`fix-rabbitmq-consumo.png`](avance3-evidencias/fix/fix-rabbitmq-consumo.png):
+  consumo RabbitMQ confirmado por MS Inventario.
