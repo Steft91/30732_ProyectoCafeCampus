@@ -17,7 +17,7 @@ afirmaciones que no existan en código.
 | Hallazgo | Acción |
 |---|---|
 | README y documentación afirmaban un filtro inexistente. | Actualizar documentación para apuntar a rutas reales del filtro. |
-| Links provisionales de corrección estaban ubicados en `planificacion-avance2`. | Reubicados en `docs/planificacion-avance3/fix/` para separar el cierre fix del Avance 2 del material propio del Avance 2. |
+| Links provisionales de corrección estaban ubicados en `planificacion-avance2`. | Reubicados en `docs/avance3-evidencias/fix/` para separar el cierre fix del Avance 2 del material propio del Avance 2. |
 | Evidencias y Kanban estaban enlazados pero no embebidos. | Embeber capturas en README con sintaxis `![]`. |
 | Fecha del tag `v2-avance2` quedó desactualizada tras retag. | Sincronizar la sección de tags con el estado evaluado: commit `c2c861e`, 2026-07-21. |
 | Tabla de latencia mantenía typo `1.56 ms`. | Corregido a `1.67 ms`. |

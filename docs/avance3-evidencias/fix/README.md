@@ -1,9 +1,9 @@
 # Fixes del Avance 2 para iniciar Avance 3
 
 Esta carpeta agrupa la trazabilidad de los arreglos aplicados después de la
-retroalimentación del Avance 2. Se ubica dentro de la planificación del Avance 3
-porque estos ajustes sirven como punto de partida antes de continuar con seguridad,
-observabilidad e integración final.
+retroalimentación del Avance 2. Se ubica dentro de las evidencias del Avance 3
+porque estos ajustes son el punto de partida verificable antes de continuar con
+seguridad, observabilidad e integración final.
 
 ## Documentos
 

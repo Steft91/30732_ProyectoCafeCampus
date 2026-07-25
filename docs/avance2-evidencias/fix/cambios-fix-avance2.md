@@ -93,7 +93,7 @@ flujo de cierre del Avance 2.
 - Se reemplazó la afirmación genérica del filtro por rutas y transportes reales.
 - Se documentó la compensación de stock a `CANCELADO`.
 
-### `docs/planificacion-avance3/fix/correcciones-avance2.md`
+### `docs/avance3-evidencias/fix/correcciones-avance2.md`
 - Se creó/reubicó el documento de correcciones solicitadas y su estado.
 
 ## 6. Evidencias fix existentes

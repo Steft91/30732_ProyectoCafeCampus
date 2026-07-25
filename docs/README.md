@@ -81,11 +81,11 @@ Contiene:
 
 ## Avance 3 — Fixes de arranque
 
-Carpeta: [`planificacion-avance3/fix/`](planificacion-avance3/fix/)
+Carpeta: [`avance3-evidencias/fix/`](avance3-evidencias/fix/)
 
 Contiene la trazabilidad de las correcciones aplicadas después de la
 retroalimentación del Avance 2 para arrancar el Avance 3 con el repositorio
 final alineado:
 
-- [`correcciones-avance2.md`](planificacion-avance3/fix/correcciones-avance2.md):
+- [`correcciones-avance2.md`](avance3-evidencias/fix/correcciones-avance2.md):
   hallazgos corregidos y estado.
