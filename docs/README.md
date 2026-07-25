@@ -49,6 +49,10 @@ Carpeta: [`avance2-evidencias/`](avance2-evidencias/)
   respuesta HTTP 422 generada al consultar un producto inexistente.
 - [`avance2-error-producto-inexistente-grpc.png`](avance2-evidencias/avance2-error-producto-inexistente-grpc.png):
   captura del error gRPC controlado.
+- [`avance2-kanban.png`](avance2-evidencias/avance2-kanban.png):
+  captura del tablero Kanban del Avance 2.
+
+![Kanban Avance 2](avance2-evidencias/avance2-kanban.png)
 
 Carpeta: [`avance2-evidencias/fix/`](avance2-evidencias/fix/)
 
@@ -72,3 +76,26 @@ Contiene:
 - comparación entre TCP, Redis, gRPC y RabbitMQ;
 - manejo de excepciones;
 - diagrama actualizado de arquitectura.
+
+---
+
+## Avance 3 — Fixes de arranque
+
+Carpeta: [`avance3-evidencias/fix/`](avance3-evidencias/fix/)
+
+Contiene la trazabilidad de las correcciones aplicadas después de la
+retroalimentación del Avance 2 para arrancar el Avance 3 con el repositorio
+final alineado:
+
+- [`correcciones-avance2.md`](avance3-evidencias/fix/correcciones-avance2.md):
+  hallazgos corregidos y estado.
+- [`fix-rama-avance3.png`](avance3-evidencias/fix/fix-rama-avance3.png):
+  rama de trabajo y estado Git limpio luego de los fixes.
+- [`fix-docker-healthy.png`](avance3-evidencias/fix/fix-docker-healthy.png):
+  stack Docker levantado después de aplicar las correcciones.
+- [`fix-pedido-exitoso.png`](avance3-evidencias/fix/fix-pedido-exitoso.png):
+  pedido exitoso validado como punto de partida del Avance 3.
+- [`fix-error-controlado.png`](avance3-evidencias/fix/fix-error-controlado.png):
+  error controlado por producto inexistente.
+- [`fix-rabbitmq-consumo.png`](avance3-evidencias/fix/fix-rabbitmq-consumo.png):
+  consumo RabbitMQ confirmado por MS Inventario.

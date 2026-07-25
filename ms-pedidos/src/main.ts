@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
+import { RpcExceptionFilter } from './common/filters/rpc-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,13 +13,14 @@ async function bootstrap() {
   );
 
   const port = process.env.PORT ?? 3002;
-  app.connectMicroservice({
+  const tcpMicroservice = app.connectMicroservice({
     transport: Transport.TCP,
     options: {
       host: '0.0.0.0',
       port: Number(process.env.TCP_PORT ?? 4002),
     },
   });
+  tcpMicroservice.useGlobalFilters(new RpcExceptionFilter());
 
   await app.startAllMicroservices();
   await app.listen(port);

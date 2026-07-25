@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
+import { RpcExceptionFilter } from './common/filters/rpc-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,21 +13,25 @@ async function bootstrap() {
   );
 
   const port = process.env.PORT ?? 3003;
-  app.connectMicroservice({
+  const tcpMicroservice = app.connectMicroservice({
     transport: Transport.TCP,
     options: {
       host: '0.0.0.0',
       port: Number(process.env.TCP_PORT ?? 4003),
     },
   });
-  app.connectMicroservice({
+  tcpMicroservice.useGlobalFilters(new RpcExceptionFilter());
+
+  const redisMicroservice = app.connectMicroservice({
     transport: Transport.REDIS,
     options: {
       host: process.env.REDIS_HOST ?? 'localhost',
       port: Number(process.env.REDIS_PORT ?? 6379),
     },
   });
-  app.connectMicroservice({
+  redisMicroservice.useGlobalFilters(new RpcExceptionFilter());
+
+  const rabbitmqMicroservice = app.connectMicroservice({
     transport: Transport.RMQ,
     options: {
       urls: [process.env.RABBITMQ_URL ?? 'amqp://guest:guest@localhost:5672'],
@@ -36,6 +41,7 @@ async function bootstrap() {
       },
     },
   });
+  rabbitmqMicroservice.useGlobalFilters(new RpcExceptionFilter());
 
   await app.startAllMicroservices();
   await app.listen(port);

@@ -33,9 +33,18 @@ El camino síncrono **TCP** y el asíncrono **Redis** del Avance 1 **se conserva
 | gRPC (Tema 7) | `ms-pedidos` → `ms-productos` | Pedidos necesita `nombre`/`precio` **reales del servidor** antes de crear un pedido, no del cliente. |
 | Segundo transporte | RabbitMQ (`amqp`) | Cola configurada como durable, con un flujo de consumo más controlado y mayor
 capacidad de retención que Redis Pub/Sub. |
-| Error controlado | Producto inexistente por gRPC | `RpcException(NOT_FOUND)` en servidor + `try/catch` en cliente + filtro RPC global para mantener la semántica sin tumbar el servicio. |
+| Error controlado | Producto inexistente por gRPC | `RpcException(NOT_FOUND)` en servidor + `try/catch` en cliente + `RpcExceptionFilter` registrado en los transportes de microservicio. |
 | Arranque en Docker | `prisma migrate deploy` antes de `start:dev` | Las tres apps que usan Prisma crean el esquema automáticamente al levantar el compose. |
 | Evidencia | `curl`, logs y capturas en `docs/avance2-evidencias/` | La rúbrica exige pruebas visibles en el repositorio. |
+
+## Tablero Kanban
+
+Tablero/proyectos del repositorio:
+<https://github.com/users/Steft91/projects/1>
+
+Captura al cierre del Avance 2:
+
+![Kanban Avance 2](../avance2-evidencias/avance2-kanban.png)
 
 ## Cómo regenerar el diagrama
 

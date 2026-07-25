@@ -159,17 +159,17 @@ sequenceDiagram
 
 ## Metodología
 
-- **Kanban:** ver [`TABLERO_KANBAN.md`](TABLERO_KANBAN.md) y el reparto en
+- **Kanban:** tablero en GitHub Projects:
+  <https://github.com/users/Steft91/projects/1>. Ver también
+  [`TABLERO_KANBAN.md`](TABLERO_KANBAN.md) y el reparto en
   [`docs/planificacion-avance1/01-roles-y-kanban.md`](docs/planificacion-avance1/01-roles-y-kanban.md)
-  (captura en `docs/avance1-evidencias/avance1-kanban.png`).
+  (capturas embebidas abajo).
+
+![Kanban Avance 1](docs/avance1-evidencias/avance1-kanban.png)
+
+![Kanban Avance 2](docs/avance2-evidencias/avance2-kanban.png)
+
 - **Ramificación:** **GitHub Flow** — `main` como rama principal y ramas `feat/…`, `chore/…` y `docs/…` para separar funcionalidades, configuración y documentación. Las ramas se integran mediante Pull Requests y se utiliza un **tag por avance**.
-- **Commits semánticos:** Conventional Commits `tipo(alcance): descripción`. Ejemplos:
-    ```
-    feat(tcp): agregar handler tcp de verificacion de stock
-    feat(redis): agregar consumidor asincrono de eventos de pedido
-    feat(gateway): agregar proxy http hacia ms-pedidos
-    docs(readme): completar seccion avance 1 con analisis y evidencia
-    ```
 
 ## Patrones y principios aplicados
 
@@ -204,10 +204,31 @@ node benchmark.js http://localhost:3000/api/benchmark/sync 200 > docs/avance1-ev
 node benchmark.js http://localhost:3000/api/benchmark/async 200 > docs/avance1-evidencias/avance1-benchmark-async.txt
 ```
 
+Para repetir la medición sin retardos artificiales:
+
+```bash
+BENCHMARK_PEDIDOS_DELAY_MS=0 BENCHMARK_INVENTARIO_DELAY_MS=0 docker compose up -d --force-recreate ms-pedidos ms-inventario gateway
+node benchmark.js http://localhost:3000/api/benchmark/sync 200 > docs/avance1-evidencias/avance1-benchmark-sync-zero-delay.txt
+node benchmark.js http://localhost:3000/api/benchmark/async 200 > docs/avance1-evidencias/avance1-benchmark-async-zero-delay.txt
+```
+
 | Camino          | Promedio (ms) | p95 (ms) | Máx (ms) | Errores |
 | --------------- | ------------: | -------: | -------: | ------: |
 | Síncrono TCP    |    **104.89** |   106.00 |   162.00 |       0 |
 | Asíncrono Redis |      **1.67** |     2.00 |    70.00 |       0 |
+
+Resultados adicionales con `BENCHMARK_PEDIDOS_DELAY_MS=0` y
+`BENCHMARK_INVENTARIO_DELAY_MS=0`:
+
+| Camino          | Promedio (ms) | p95 (ms) | Máx (ms) | Errores |
+| --------------- | ------------: | -------: | -------: | ------: |
+| Síncrono TCP    |      **6.85** |     9.00 |    67.00 |       0 |
+| Asíncrono Redis |      **3.10** |     4.00 |    75.00 |       0 |
+
+La comparación completa sin delays se documenta en
+[`docs/planificacion-avance1/03-analisis-latencia-acoplamiento.md`](docs/planificacion-avance1/03-analisis-latencia-acoplamiento.md)
+y queda respaldada por `docs/avance1-evidencias/avance1-benchmark-sync-zero-delay.txt`
+y `docs/avance1-evidencias/avance1-benchmark-async-zero-delay.txt`.
 
 ### Acoplamiento temporal (prueba de caída)
 
@@ -262,9 +283,11 @@ Cuando se consulta un producto inexistente, MS Productos devuelve una
 `try/catch` y lo traduce a una respuesta HTTP `422 Unprocessable Entity`, sin
 detener ninguno de los servicios.
 
-Además, `ms-pedidos` y `ms-inventario` registran un filtro RPC global para que
-cualquier excepción HTTP inesperada dentro de handlers microservicio se traduzca
-a semántica RPC en vez de romper el flujo.
+Además, los microservicios que exponen handlers internos registran un
+`RpcExceptionFilter` global sobre sus transportes reales:
+`ms-productos` en gRPC, `ms-pedidos` en TCP y `ms-inventario` en TCP/Redis/RabbitMQ.
+Con esto las `RpcException` mantienen semántica RPC y no se degradan a errores
+desconocidos del transporte.
 
 ### Comparación de transportes
 
@@ -284,11 +307,31 @@ Documentación ampliada:
 ### Evidencias
 
 - [Pedido exitoso mediante gRPC](docs/avance2-evidencias/pedidos-grpc-rabbitmq.txt)
-- [Captura del pedido exitoso](docs/avance2-evidencias/avance2-pedido-grpc-rabbitmq.png)
 - [Evento RabbitMQ consumido](docs/avance2-evidencias/rabbitmq-inventario.txt)
-- [Captura del consumidor RabbitMQ](docs/avance2-evidencias/avance2-rabbitmq-inventario-log.png)
 - [Error gRPC controlado](docs/avance2-evidencias/error-producto-inexistente-grpc.txt)
-- [Captura del error HTTP 422](docs/avance2-evidencias/avance2-error-producto-inexistente-grpc.png)
+
+**Pedido exitoso con datos reales obtenidos por gRPC**
+
+![Pedido exitoso gRPC + RabbitMQ](docs/avance2-evidencias/avance2-pedido-grpc-rabbitmq.png)
+
+**Evento RabbitMQ consumido por MS Inventario**
+
+![Log RabbitMQ Inventario](docs/avance2-evidencias/avance2-rabbitmq-inventario-log.png)
+
+**Error controlado: producto inexistente -> HTTP 422**
+
+![Error gRPC controlado](docs/avance2-evidencias/avance2-error-producto-inexistente-grpc.png)
+
+**Kanban al cierre del Avance 2**
+
+![Kanban Avance 2](docs/avance2-evidencias/avance2-kanban.png)
+
+**Evidencias fix post-retroalimentación**
+
+![Stack Docker luego de fixes](docs/avance2-evidencias/fix/fix-compose-ps.png)
+![Error controlado validado luego de fixes](docs/avance2-evidencias/fix/fix-grpc-error-controlado.png)
+![Pedido exitoso validado luego de fixes](docs/avance2-evidencias/fix/fix-pedido-exitoso-grpc-rabbitmq.png)
+![RabbitMQ validado luego de fixes](docs/avance2-evidencias/fix/fix-rabbitmq-inventario.png)
 
 ### Arquitectura del Avance 2
 
@@ -346,6 +389,24 @@ Documentación ampliada:
 _Pendiente._ Login que emite JWT y Guard que protege rutas (200 con token / 401 sin token / 403 por
 rol), observabilidad con Sentry, integración final y sección de defensa.
 
+### Evidencias post-retroalimentación para iniciar Avance 3
+
+Estas capturas documentan que el repositorio quedó estable luego de aplicar la
+retroalimentación del Avance 2. No reemplazan las evidencias finales del Avance
+3; sirven como punto de partida verificable.
+
+- [Trazabilidad de correcciones](docs/avance3-evidencias/fix/correcciones-avance2.md)
+
+![Rama y estado Git luego de fixes](docs/avance3-evidencias/fix/fix-rama-avance3.png)
+
+![Stack Docker luego de fixes](docs/avance3-evidencias/fix/fix-docker-healthy.png)
+
+![Pedido exitoso luego de fixes](docs/avance3-evidencias/fix/fix-pedido-exitoso.png)
+
+![Error controlado luego de fixes](docs/avance3-evidencias/fix/fix-error-controlado.png)
+
+![Consumo RabbitMQ luego de fixes](docs/avance3-evidencias/fix/fix-rabbitmq-consumo.png)
+
 ## Defensa
 
 _Pendiente (Avance 3)._
@@ -353,5 +414,5 @@ _Pendiente (Avance 3)._
 ## Tags de entrega
 
 - `v1-avance1` — 2026-07-14
-- `v2-avance2` — 2026-07-17
+- `v2-avance2` — 2026-07-21 (tag retaggeado con correcciones, commit `c2c861e`)
 - `v3-final` — pendiente
