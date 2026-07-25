@@ -159,9 +159,13 @@ sequenceDiagram
 
 ## Metodología
 
-- **Kanban:** ver [`TABLERO_KANBAN.md`](TABLERO_KANBAN.md) y el reparto en
+- **Kanban:** tablero en GitHub Projects:
+  <https://github.com/Steft91/30732_ProyectoCafeCampus/projects>. Ver también
+  [`TABLERO_KANBAN.md`](TABLERO_KANBAN.md) y el reparto en
   [`docs/planificacion-avance1/01-roles-y-kanban.md`](docs/planificacion-avance1/01-roles-y-kanban.md)
-  (captura en `docs/avance1-evidencias/avance1-kanban.png`).
+  (captura embebida abajo).
+
+![Kanban Avance 1](docs/avance1-evidencias/avance1-kanban.png)
 - **Ramificación:** **GitHub Flow** — `main` como rama principal y ramas `feat/…`, `chore/…` y `docs/…` para separar funcionalidades, configuración y documentación. Las ramas se integran mediante Pull Requests y se utiliza un **tag por avance**.
 - **Commits semánticos:** Conventional Commits `tipo(alcance): descripción`. Ejemplos:
     ```
@@ -286,11 +290,31 @@ Documentación ampliada:
 ### Evidencias
 
 - [Pedido exitoso mediante gRPC](docs/avance2-evidencias/pedidos-grpc-rabbitmq.txt)
-- [Captura del pedido exitoso](docs/avance2-evidencias/avance2-pedido-grpc-rabbitmq.png)
 - [Evento RabbitMQ consumido](docs/avance2-evidencias/rabbitmq-inventario.txt)
-- [Captura del consumidor RabbitMQ](docs/avance2-evidencias/avance2-rabbitmq-inventario-log.png)
 - [Error gRPC controlado](docs/avance2-evidencias/error-producto-inexistente-grpc.txt)
-- [Captura del error HTTP 422](docs/avance2-evidencias/avance2-error-producto-inexistente-grpc.png)
+
+**Pedido exitoso con datos reales obtenidos por gRPC**
+
+![Pedido exitoso gRPC + RabbitMQ](docs/avance2-evidencias/avance2-pedido-grpc-rabbitmq.png)
+
+**Evento RabbitMQ consumido por MS Inventario**
+
+![Log RabbitMQ Inventario](docs/avance2-evidencias/avance2-rabbitmq-inventario-log.png)
+
+**Error controlado: producto inexistente -> HTTP 422**
+
+![Error gRPC controlado](docs/avance2-evidencias/avance2-error-producto-inexistente-grpc.png)
+
+**Kanban al cierre del Avance 2**
+
+![Kanban Avance 2](docs/avance2-evidencias/avance2-kanban.png)
+
+**Evidencias fix post-retroalimentacion**
+
+![Stack Docker luego de fixes](docs/avance2-evidencias/fix/fix-compose-ps.png)
+![Error controlado validado luego de fixes](docs/avance2-evidencias/fix/fix-grpc-error-controlado.png)
+![Pedido exitoso validado luego de fixes](docs/avance2-evidencias/fix/fix-pedido-exitoso-grpc-rabbitmq.png)
+![RabbitMQ validado luego de fixes](docs/avance2-evidencias/fix/fix-rabbitmq-inventario.png)
 
 ### Arquitectura del Avance 2
 
@@ -355,5 +379,5 @@ _Pendiente (Avance 3)._
 ## Tags de entrega
 
 - `v1-avance1` — 2026-07-14
-- `v2-avance2` — 2026-07-17
+- `v2-avance2` — 2026-07-21 (tag retaggeado con correcciones, commit `c2c861e`)
 - `v3-final` — pendiente

@@ -2,6 +2,8 @@
 
 Flujo de columnas en GitHub Projects:
 
+URL del tablero/proyectos del repositorio: <https://github.com/Steft91/30732_ProyectoCafeCampus/projects>
+
 `Backlog` -> `Por hacer` -> `En progreso` -> `En revision` -> `Hecho`
 
 Cada tarjeta se trabaja en una rama independiente (`feat/…`, `chore/…`, `docs/…`)
@@ -48,7 +50,7 @@ propiedad por directorio estan en
 | [x] | Generar evidencias de gRPC, RabbitMQ y error controlado | S | `docs/avance2-evidencias` |
 | [x] | Actualizar tabla comparativa y diagrama | S | `docs/avance2-evidencias` |
 | [x] | Actualizar README y documentación | S | `docs/avance2-evidencias` |
-| [ ] | Crear tag `v2-avance2` después del merge final | S | sobre `main` |
+| [x] | Crear tag `v2-avance2` después del merge final | S | sobre `main` |
 
 ## Avance 3 — Seguridad, observabilidad e integracion (`v3-final`)
 
@@ -73,3 +75,5 @@ propiedad por directorio estan en
 | — | — | — | — | Documentación del Avance 2 |
 
 > Para cerrar se adjunta la captura del tablero al cierre del Avance 2 en `docs/avance2-evidencias/avance2-kanban.png`.
+
+![Kanban Avance 2](docs/avance2-evidencias/avance2-kanban.png)
