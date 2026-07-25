@@ -160,7 +160,7 @@ sequenceDiagram
 ## Metodología
 
 - **Kanban:** tablero en GitHub Projects:
-  <https://github.com/Steft91/30732_ProyectoCafeCampus/projects>. Ver también
+  <https://github.com/users/Steft91/projects/1>. Ver también
   [`TABLERO_KANBAN.md`](TABLERO_KANBAN.md) y el reparto en
   [`docs/planificacion-avance1/01-roles-y-kanban.md`](docs/planificacion-avance1/01-roles-y-kanban.md)
   (capturas embebidas abajo).

@@ -40,7 +40,7 @@ capacidad de retención que Redis Pub/Sub. |
 ## Tablero Kanban
 
 Tablero/proyectos del repositorio:
-<https://github.com/Steft91/30732_ProyectoCafeCampus/projects>
+<https://github.com/users/Steft91/projects/1>
 
 Captura al cierre del Avance 2:
 

@@ -2,7 +2,7 @@
 
 Flujo de columnas en GitHub Projects:
 
-URL del tablero/proyectos del repositorio: <https://github.com/Steft91/30732_ProyectoCafeCampus/projects>
+URL del tablero/proyectos del repositorio: <https://github.com/users/Steft91/projects/1>
 
 `Backlog` -> `Por hacer` -> `En progreso` -> `En revision` -> `Hecho`
 
