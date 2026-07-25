@@ -37,6 +37,15 @@ capacidad de retención que Redis Pub/Sub. |
 | Arranque en Docker | `prisma migrate deploy` antes de `start:dev` | Las tres apps que usan Prisma crean el esquema automáticamente al levantar el compose. |
 | Evidencia | `curl`, logs y capturas en `docs/avance2-evidencias/` | La rúbrica exige pruebas visibles en el repositorio. |
 
+## Tablero Kanban
+
+Tablero/proyectos del repositorio:
+<https://github.com/Steft91/30732_ProyectoCafeCampus/projects>
+
+Captura al cierre del Avance 2:
+
+![Kanban Avance 2](../avance2-evidencias/avance2-kanban.png)
+
 ## Cómo regenerar el diagrama
 
 El PNG/SVG ya están exportados y versionados. Si se edita el `.puml`, **hay que regenerarlos**:

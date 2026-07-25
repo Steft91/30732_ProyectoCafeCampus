@@ -49,6 +49,10 @@ Carpeta: [`avance2-evidencias/`](avance2-evidencias/)
   respuesta HTTP 422 generada al consultar un producto inexistente.
 - [`avance2-error-producto-inexistente-grpc.png`](avance2-evidencias/avance2-error-producto-inexistente-grpc.png):
   captura del error gRPC controlado.
+- [`avance2-kanban.png`](avance2-evidencias/avance2-kanban.png):
+  captura del tablero Kanban del Avance 2.
+
+![Kanban Avance 2](avance2-evidencias/avance2-kanban.png)
 
 Carpeta: [`avance2-evidencias/fix/`](avance2-evidencias/fix/)
 
@@ -85,5 +89,3 @@ final alineado:
 
 - [`correcciones-avance2.md`](planificacion-avance3/fix/correcciones-avance2.md):
   hallazgos corregidos y estado.
-- [`commits-semanticos-fix.md`](planificacion-avance3/fix/commits-semanticos-fix.md):
-  secuencia de commits semánticos de la rama `fix-avance-2`.

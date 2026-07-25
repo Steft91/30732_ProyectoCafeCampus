@@ -163,17 +163,13 @@ sequenceDiagram
   <https://github.com/Steft91/30732_ProyectoCafeCampus/projects>. Ver también
   [`TABLERO_KANBAN.md`](TABLERO_KANBAN.md) y el reparto en
   [`docs/planificacion-avance1/01-roles-y-kanban.md`](docs/planificacion-avance1/01-roles-y-kanban.md)
-  (captura embebida abajo).
+  (capturas embebidas abajo).
 
 ![Kanban Avance 1](docs/avance1-evidencias/avance1-kanban.png)
+
+![Kanban Avance 2](docs/avance2-evidencias/avance2-kanban.png)
+
 - **Ramificación:** **GitHub Flow** — `main` como rama principal y ramas `feat/…`, `chore/…` y `docs/…` para separar funcionalidades, configuración y documentación. Las ramas se integran mediante Pull Requests y se utiliza un **tag por avance**.
-- **Commits semánticos:** Conventional Commits `tipo(alcance): descripción`. Ejemplos:
-    ```
-    feat(tcp): agregar handler tcp de verificacion de stock
-    feat(redis): agregar consumidor asincrono de eventos de pedido
-    feat(gateway): agregar proxy http hacia ms-pedidos
-    docs(readme): completar seccion avance 1 con analisis y evidencia
-    ```
 
 ## Patrones y principios aplicados
 

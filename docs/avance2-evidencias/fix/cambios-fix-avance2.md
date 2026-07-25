@@ -96,9 +96,6 @@ flujo de cierre del Avance 2.
 ### `docs/planificacion-avance3/fix/correcciones-avance2.md`
 - Se creó/reubicó el documento de correcciones solicitadas y su estado.
 
-### `docs/planificacion-avance3/fix/commits-semanticos-fix.md`
-- Se creó/reubicó el plan de commits semánticos usado para cerrar la rama de fix.
-
 ## 6. Evidencias fix existentes
 
 Carpeta: `docs/avance2-evidencias/fix/`

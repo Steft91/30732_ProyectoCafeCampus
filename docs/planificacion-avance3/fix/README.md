@@ -10,7 +10,6 @@ observabilidad e integración final.
 | Documento | Contenido |
 |---|---|
 | [`correcciones-avance2.md`](correcciones-avance2.md) | Lista de hallazgos corregidos y estado de cada punto. |
-| [`commits-semanticos-fix.md`](commits-semanticos-fix.md) | Secuencia de commits semánticos usados en la rama `fix-avance-2`. |
 
 ## Evidencias relacionadas
 
