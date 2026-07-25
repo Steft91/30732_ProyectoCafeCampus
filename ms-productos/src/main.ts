@@ -2,15 +2,15 @@ import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { Transport } from "@nestjs/microservices";
 import "dotenv/config";
-import { join } from "path";
 import { AppModule } from "./app.module";
+import { RpcExceptionFilter } from "./common/filters/rpc-exception.filter";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
     const port = process.env.PORT ?? 3001;
-    app.connectMicroservice({
+    const grpcMicroservice = app.connectMicroservice({
         transport: Transport.GRPC,
         options: {
             package: "productos",
@@ -18,6 +18,7 @@ async function bootstrap() {
             url: `0.0.0.0:${process.env.GRPC_PORT ?? 50051}`,
         },
     });
+    grpcMicroservice.useGlobalFilters(new RpcExceptionFilter());
 
     await app.startAllMicroservices();
     await app.listen(port);
