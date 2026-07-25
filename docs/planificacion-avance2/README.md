@@ -24,6 +24,8 @@ El camino síncrono **TCP** y el asíncrono **Redis** del Avance 1 **se conserva
 | [`01-roles-y-kanban.md`](01-roles-y-kanban.md) | Roles, propiedad por directorio y reparto de tarjetas Kanban del Avance 2. |
 | [`02-patrones-y-principios.md`](02-patrones-y-principios.md) | Patrones/principios aplicados (framework vs equipo) — criterio C4. |
 | [`03-comparacion-transportes-excepciones.md`](03-comparacion-transportes-excepciones.md) | Comparación de los 4 transportes y estrategia de excepciones — criterios C2/C3. |
+| [`04-correcciones.md`](04-correcciones.md) | Correcciones derivadas de la retroalimentación de los avances 1 y 2. |
+| [`05-plan-de-commits.md`](05-plan-de-commits.md) | Plan de commits semánticos para cerrar las correcciones en rama de fix. |
 
 
 ## Decisión técnica
@@ -33,7 +35,7 @@ El camino síncrono **TCP** y el asíncrono **Redis** del Avance 1 **se conserva
 | gRPC (Tema 7) | `ms-pedidos` → `ms-productos` | Pedidos necesita `nombre`/`precio` **reales del servidor** antes de crear un pedido, no del cliente. |
 | Segundo transporte | RabbitMQ (`amqp`) | Cola configurada como durable, con un flujo de consumo más controlado y mayor
 capacidad de retención que Redis Pub/Sub. |
-| Error controlado | Producto inexistente por gRPC | `RpcException(NOT_FOUND)` en servidor + `try/catch` en cliente + filtro RPC global para mantener la semántica sin tumbar el servicio. |
+| Error controlado | Producto inexistente por gRPC | `RpcException(NOT_FOUND)` en servidor + `try/catch` en cliente + `RpcExceptionFilter` registrado en los transportes de microservicio. |
 | Arranque en Docker | `prisma migrate deploy` antes de `start:dev` | Las tres apps que usan Prisma crean el esquema automáticamente al levantar el compose. |
 | Evidencia | `curl`, logs y capturas en `docs/avance2-evidencias/` | La rúbrica exige pruebas visibles en el repositorio. |
 

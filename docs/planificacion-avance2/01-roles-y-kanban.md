@@ -43,26 +43,25 @@ la integración de las ramas. El único archivo compartido (`docker-compose.yml`
 
 El Avance 2 ya se había cerrado con tag cuando llegó la retroalimentación del Avance 1 (16.8/20).
 Como los puntos señalados (falta de `RpcExceptionFilter`, `ServiceUnavailableException` dentro de
-un `@MessagePattern`, migraciones Prisma ausentes en Compose, entre otros) siguen presentes en
-`main`, se abre un rol de **fixer** — el equivalente en este tablero a una tarjeta de tipo _bug
+un `@MessagePattern`, migraciones Prisma ausentes en Compose, entre otros) debían entrar dentro del
+Avance 2, se abrió un rol de **fixer** — el equivalente en este tablero a una tarjeta de tipo _bug
 fix_ — antes de volver a etiquetar `v2-avance2`. Detalle de hallazgos y prioridades en
 [`04-correcciones.md`](04-correcciones.md).
 
 | Integrante         | Rol fixer              | Responsabilidad                                                                                                                                                           | Rama                                    |
 | ------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| **Marcos Escobar** | Fixer · Planificación  | Documenta y sube el plan de correcciones (`04-correcciones.md`, este archivo, `05-plan-de-commits.md`) a `main`; no toca código de servicio en esta fase                  | commit directo a `main` (documentación) |
-| **Stefany Díaz**   | Fixer · Implementación | Ejecuta las correcciones de código (P1–P3 de `04-correcciones.md`) sobre `ms-pedidos`, `ms-inventario` y `docker-compose.yml`; commits aún **en progreso**, no fusionados | `fix/correcciones-g3-avance1`           |
+| **Marcos Escobar** | Fixer · Planificación  | Documenta el plan de correcciones (`04-correcciones.md`, este archivo, `05-plan-de-commits.md`) y deja trazabilidad del cierre. | `fix-avance-2` |
+| **Stefany Díaz**   | Fixer · Implementación | Ejecuta las correcciones de código y validación funcional sobre los microservicios y `docker-compose.yml`. | `fix-avance-2` |
 
 > Equivalencia con el flujo Kanban existente: una tarjeta _fixer_ se comporta como cualquier
-> tarjeta `feat/`/`fix/` de GitHub Flow — vive en su propia rama, se integra por Pull Request y
-> queda en la columna **En progreso** de `TABLERO_KANBAN.md` hasta que las correcciones de Stefany
-> estén listas para revisión.
+> tarjeta `feat/`/`fix/` de GitHub Flow: vive en su propia rama, se valida con evidencias y luego
+> se integra por Pull Request o merge revisado hacia `main`.
 
 ## Cómo se conecta con GitHub Flow
 
 - `main` se utiliza como rama estable de integración; cada tarjeta se trabaja en una rama independiente.
 - Cada rama se integra a `main` mediante Pull Request.
 - Un **tag por avance**: `v2-avance2`, creado después de integrar en `main`
-  los microservicios, la documentación y las evidencias del Avance 2. Tras la retroalimentación
-  del Avance 1, el tag se **actualizará** una vez fusionada la rama `fix/correcciones-g3-avance1`
-  (ver rol _fixer_ arriba).
+  los microservicios, la documentación y las evidencias del Avance 2. Tras la retroalimentación,
+  las correcciones se concentran en `fix-avance-2` para recuperar trazabilidad antes de actualizar
+  nuevamente `main`.

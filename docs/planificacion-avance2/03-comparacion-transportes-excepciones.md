@@ -66,8 +66,11 @@ Evidencias del flujo exitoso:
   `obtenerSnapshotsProductos`) envuelve la llamada en **`try/catch`** y traduce el error a
   `HttpException(..., 422 UNPROCESSABLE_ENTITY)`. Resultado: el cliente recibe un `422` claro y
   **ningún servicio se cae**.
-  Además, `ms-pedidos` y `ms-inventario` registran un filtro RPC global para traducir excepciones
-  inesperadas a semántica compatible con microservicios.
+  Además, `ms-productos`, `ms-pedidos` y `ms-inventario` registran
+  `RpcExceptionFilter` sobre sus transportes internos:
+  gRPC en Productos, TCP en Pedidos, y TCP/Redis/RabbitMQ en Inventario.
+  Así, las `RpcException` conservan su semántica de microservicio en lugar de
+  degradarse a errores desconocidos del transporte.
   Evidencia: [`error-producto-inexistente-grpc.txt`](../avance2-evidencias/error-producto-inexistente-grpc.txt)
   y [`avance2-error-producto-inexistente-grpc.png`](../avance2-evidencias/avance2-error-producto-inexistente-grpc.png).
 
@@ -92,6 +95,6 @@ de modo que **un fallo aguas abajo nunca derriba el proceso** que lo invoca.
 
 El Avance 2 demuestra que los cuatro transportes cumplen roles complementarios: gRPC aporta un canal
 síncrono **tipado por contrato** para datos autoritativos del servidor, y RabbitMQ aporta un canal asíncrono basado en cola y con mayor capacidad de
-retención y control de consumo que Redis Pub/Sub. El manejo de excepciones —traducción de `RpcException` a HTTP `422` mediante
-`try/catch`— evidencia, con un error real y reproducible (producto inexistente), que un fallo
-controlado **no interrumpe la disponibilidad** de los microservicios.
+retención y control de consumo que Redis Pub/Sub. El manejo de excepciones —`RpcExceptionFilter` en los handlers internos y traducción de `RpcException`
+a HTTP `422` mediante `try/catch` en el borde HTTP— evidencia, con un error real y reproducible
+(producto inexistente), que un fallo controlado **no interrumpe la disponibilidad** de los microservicios.

@@ -262,9 +262,11 @@ Cuando se consulta un producto inexistente, MS Productos devuelve una
 `try/catch` y lo traduce a una respuesta HTTP `422 Unprocessable Entity`, sin
 detener ninguno de los servicios.
 
-Además, `ms-pedidos` y `ms-inventario` registran un filtro RPC global para que
-cualquier excepción HTTP inesperada dentro de handlers microservicio se traduzca
-a semántica RPC en vez de romper el flujo.
+Además, los microservicios que exponen handlers internos registran un
+`RpcExceptionFilter` global sobre sus transportes reales:
+`ms-productos` en gRPC, `ms-pedidos` en TCP y `ms-inventario` en TCP/Redis/RabbitMQ.
+Con esto las `RpcException` mantienen semántica RPC y no se degradan a errores
+desconocidos del transporte.
 
 ### Comparación de transportes
 
