@@ -1,0 +1,24 @@
+<svg width="760" height="560" viewBox="0 0 760 560" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="760" height="560" rx="56" fill="#F6EFE6"/>
+  <path d="M65 115C129 22 262 34 306 103C353 178 445 78 560 92C695 108 724 254 657 356C592 454 440 394 357 474C278 551 119 516 91 397C67 296 8 198 65 115Z" fill="#E5CBBB"/>
+  <path d="M140 395C206 331 277 350 333 392C381 428 472 387 541 405C606 421 622 490 573 518C482 571 370 501 290 517C205 535 79 454 140 395Z" fill="#CFA091" opacity=".38"/>
+  <ellipse cx="409" cy="355" rx="178" ry="42" fill="#A97160" opacity=".25"/>
+  <ellipse cx="398" cy="335" rx="132" ry="36" fill="#714532" opacity=".22"/>
+  <path d="M231 218H511C498 330 464 396 371 396C279 396 242 330 231 218Z" fill="#D7A289"/>
+  <path d="M242 229H500C486 324 456 374 371 374C287 374 257 324 242 229Z" fill="#F3D4BF"/>
+  <ellipse cx="371" cy="218" rx="142" ry="46" fill="#8A553D"/>
+  <ellipse cx="371" cy="214" rx="119" ry="33" fill="#F1C7A7"/>
+  <ellipse cx="371" cy="212" rx="99" ry="24" fill="#7E4935"/>
+  <path d="M304 212C329 188 361 188 372 211C385 236 429 213 439 199C429 234 394 249 367 229C344 211 322 215 304 212Z" fill="#F7E6D9"/>
+  <path d="M326 204C350 199 365 205 374 220C359 214 346 207 326 204Z" fill="#C88967"/>
+  <path d="M510 242C594 226 601 337 517 332" stroke="#A97160" stroke-width="28" stroke-linecap="round"/>
+  <path d="M514 267C558 261 560 311 518 307" stroke="#F3D4BF" stroke-width="18" stroke-linecap="round"/>
+  <path d="M570 111C575 91 603 91 610 111C630 111 639 137 620 150C628 171 606 188 590 174C573 188 551 171 559 150C540 137 550 111 570 111Z" fill="#A97160" opacity=".35"/>
+  <path d="M145 152C141 127 174 116 188 137C210 125 233 151 218 171C236 190 217 219 193 210C181 233 147 222 148 196C124 194 117 159 145 152Z" fill="#CFA091" opacity=".5"/>
+  <circle cx="605" cy="405" r="18" fill="#7B3E47" opacity=".18"/>
+  <circle cx="154" cy="327" r="13" fill="#7B3E47" opacity=".18"/>
+  <circle cx="593" cy="388" r="8" fill="#7B3E47" opacity=".18"/>
+  <path d="M644 214C628 229 630 245 646 260" stroke="#8A553D" stroke-width="5" stroke-linecap="round"/>
+  <path d="M673 199C657 221 658 244 676 267" stroke="#8A553D" stroke-width="5" stroke-linecap="round"/>
+  <path d="M118 265C105 279 105 293 119 307" stroke="#8A553D" stroke-width="5" stroke-linecap="round"/>
+</svg>

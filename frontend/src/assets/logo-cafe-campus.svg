@@ -1,0 +1,17 @@
+<svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Cafe Campus</title>
+  <desc id="desc">Logo de una taza de cafe con vapor</desc>
+  <rect width="96" height="96" rx="28" fill="#FFF7EC"/>
+  <path d="M33 25C29 20 36 17 33 12" stroke="#B97978" stroke-width="4" stroke-linecap="round"/>
+  <path d="M49 25C45 20 52 17 49 12" stroke="#B97978" stroke-width="4" stroke-linecap="round"/>
+  <path d="M62 27C59 23 65 20 62 16" stroke="#B97978" stroke-width="4" stroke-linecap="round"/>
+  <path d="M25 40H61C61 58 55 70 43 70C31 70 25 58 25 40Z" fill="#7D4E3B"/>
+  <path d="M30 44H56C55 57 51 64 43 64C35 64 31 57 30 44Z" fill="#D7A289"/>
+  <path d="M61 46H68C73 46 77 50 77 55C77 60 73 64 68 64H61" stroke="#7D4E3B" stroke-width="6" stroke-linecap="round"/>
+  <ellipse cx="43" cy="40" rx="20" ry="7" fill="#F8DFC8"/>
+  <ellipse cx="43" cy="40" rx="12" ry="4" fill="#8A553D"/>
+  <path d="M36 40C39 36 47 36 50 40C47 43 39 43 36 40Z" fill="#FFF7EC"/>
+  <path d="M20 73H69" stroke="#50364A" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="73" cy="28" r="5" fill="#F0C7C3"/>
+  <circle cx="21" cy="31" r="3" fill="#E6C7B5"/>
+</svg>
