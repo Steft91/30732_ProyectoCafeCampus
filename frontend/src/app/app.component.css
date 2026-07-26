@@ -476,6 +476,10 @@ h1 {
   gap: 16px;
 }
 
+.menu-grid.admin-menu-grid {
+  grid-template-columns: repeat(auto-fit, minmax(430px, 1fr));
+}
+
 .product-card {
   min-height: 360px;
   padding: 14px;
@@ -806,13 +810,18 @@ button.secondary-button {
 }
 
 .admin-product-actions {
-  display: grid;
-  grid-template-columns: minmax(90px, 1fr) auto auto auto;
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   align-items: end;
 }
 
+.admin-product-actions label {
+  flex: 1 1 120px;
+}
+
 .admin-product-actions button {
+  flex: 1 1 118px;
   min-height: 40px;
   border: 0;
   border-radius: 999px;
@@ -827,9 +836,16 @@ button.secondary-button {
 }
 
 @media (max-width: 620px) {
-  .admin-form-row,
-  .admin-product-actions {
+  .admin-form-row {
     grid-template-columns: 1fr;
+  }
+
+  .menu-grid.admin-menu-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-product-actions > * {
+    flex-basis: 100%;
   }
 }
 

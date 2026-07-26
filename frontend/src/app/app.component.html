@@ -226,7 +226,7 @@
           </button>
         </div>
 
-        <div class="menu-grid">
+        <div class="menu-grid" [class.admin-menu-grid]="puedeAdministrar()">
           <article class="product-card" *ngFor="let producto of productosFiltrados()" [class.product-paused]="puedeAdministrar() && !producto.disponible">
             <div class="product-photo">
               <img [src]="productImage(producto)" [alt]="imageAlt(producto)" loading="lazy">
