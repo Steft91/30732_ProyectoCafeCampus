@@ -440,7 +440,7 @@ Documentación ampliada:
    por gRPC, sin tumbar los servicios.
 
 
-## Avance 3 — Seguridad, observabilidad e integración (FINAL) · `tag v3-final`
+## Avance 3 — Seguridad, observabilidad e integración (FINAL) · tag previsto `v3-final`
 
 ### Diagrama final del sistema integrado
 
@@ -632,4 +632,4 @@ Preguntas probables y respuestas guía:
 
 - `v1-avance1` — 2026-07-14
 - `v2-avance2` — 2026-07-21 (tag retaggeado con correcciones, commit `c2c861e`)
-- `v3-final` — pendiente
+- `v3-final` — previsto para 2026-07-26 tras merge a `main` y tag de release
