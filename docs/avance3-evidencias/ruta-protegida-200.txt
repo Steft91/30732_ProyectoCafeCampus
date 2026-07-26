@@ -1,0 +1,4 @@
+$ ADMIN_TOKEN=$(curl -s -X POST http://localhost:3000/api/auth/login -H "Content-Type: application/json" -d "{\"email\":\"admin@campus.edu\",\"password\":\"admin123\"}" | jq -r ".access_token")
+$ curl -s -w "\nHTTP_STATUS:%{http_code}\n" http://localhost:3000/api/pedidos -H "Authorization: Bearer $ADMIN_TOKEN"
+[{"id":"ef9883a2-b561-464d-897a-4be2c61fc6e8","usuarioId":"3","estado":"PENDIENTE","total":"5","creadoEn":"2026-07-19T18:50:47.009Z","actualizadoEn":"2026-07-19T18:50:47.009Z","items":[{"id":"49c6e150-f6bb-41a9-b172-4ff1b4ca731c","pedidoId":"ef9883a2-b561-464d-897a-4be2c61fc6e8","productoId":"5aa144b8-470a-4f46-ad4f-121ba9ca72e3","nombre":"Cappuccino","precio":"2.5","cantidad":2}]}]
+HTTP_STATUS:200

@@ -1,0 +1,3 @@
+$ curl -s -w "\nHTTP_STATUS:%{http_code}\n" -X POST http://localhost:3000/api/auth/login -H "Content-Type: application/json" -d "{\"email\":\"estudiante@campus.edu\",\"password\":\"est123\"}"
+{"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZW1haWwiOiJlc3R1ZGlhbnRlQGNhbXB1cy5lZHUiLCJyb2wiOiJlc3R1ZGlhbnRlIiwiaWF0IjoxNzg0NDg4NTM0LCJleHAiOjE3ODQ1MTczMzR9.GtgwB8SIEo8r3rrGSbLoH7LbqbwCpzq0Gz5NDJHRpD8","rol":"estudiante"}
+HTTP_STATUS:200

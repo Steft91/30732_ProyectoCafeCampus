@@ -1,0 +1,6 @@
+$ ESTUDIANTE_TOKEN=$(curl ... login estudiante)
+$ PRODUCTO_ID=$(curl -s http://localhost:13001/productos | jq -r ".[] | select(.nombre==\"Cappuccino\") | .id")
+PRODUCTO_ID=5aa144b8-470a-4f46-ad4f-121ba9ca72e3
+$ curl -s -w "\nHTTP_STATUS:%{http_code}\n" -X POST http://localhost:3000/api/pedidos ...
+{"id":"3d60889c-60ff-46b9-a376-c2c1d8d4d89f","usuarioId":"3","estado":"PENDIENTE","total":"5","creadoEn":"2026-07-19T19:19:30.444Z","actualizadoEn":"2026-07-19T19:19:30.444Z","items":[{"id":"b13c0a04-f988-4631-9406-76038a4c9c02","pedidoId":"3d60889c-60ff-46b9-a376-c2c1d8d4d89f","productoId":"5aa144b8-470a-4f46-ad4f-121ba9ca72e3","nombre":"Cappuccino","precio":"2.5","cantidad":2}]}
+HTTP_STATUS:201

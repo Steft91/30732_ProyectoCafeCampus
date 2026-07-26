@@ -1,0 +1,4 @@
+$ ESTUDIANTE_TOKEN=$(curl -s -X POST http://localhost:3000/api/auth/login -H "Content-Type: application/json" -d "{\"email\":\"estudiante@campus.edu\",\"password\":\"est123\"}" | jq -r ".access_token")
+$ curl -s -w "\nHTTP_STATUS:%{http_code}\n" http://localhost:3000/api/pedidos -H "Authorization: Bearer $ESTUDIANTE_TOKEN"
+{"message":"Se requiere uno de los siguientes roles: admin, personal","error":"Forbidden","statusCode":403}
+HTTP_STATUS:403

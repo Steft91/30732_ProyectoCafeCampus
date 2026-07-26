@@ -1,0 +1,2 @@
+"Error gRPC al consultar producto: 5 NOT_FOUND: Producto con id producto-inexistente no encontrado"
+HTTP_STATUS:422

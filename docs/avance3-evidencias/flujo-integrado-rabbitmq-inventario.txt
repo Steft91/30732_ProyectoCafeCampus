@@ -1,0 +1,2 @@
+$ docker compose -f docker-compose.final.yml logs --tail=120 ms-inventario | grep "Evento RabbitMQ recibido"
+ms-inventario-1  | [32m[Nest] 172  - [39m07/19/2026, 7:19:30 PM [32m    LOG[39m [38;5;3m[PedidosRabbitmqController] [39m[32mEvento RabbitMQ recibido: pedido=3d60889c-60ff-46b9-a376-c2c1d8d4d89f, usuario=3, total=5, items=1[39m

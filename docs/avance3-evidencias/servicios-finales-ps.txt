@@ -1,0 +1,9 @@
+$ docker compose -f docker-compose.final.yml ps
+NAME                             IMAGE                          COMMAND                  SERVICE         CREATED          STATUS                    PORTS
+cafe-campus-final-postgres       postgres:16-alpine             "docker-entrypoint.s…"   postgres        29 minutes ago   Up 29 minutes (healthy)   0.0.0.0:15432->5432/tcp, [::]:15432->5432/tcp
+cafe-campus-final-rabbitmq       rabbitmq:3-management-alpine   "docker-entrypoint.s…"   rabbitmq        29 minutes ago   Up 29 minutes             4369/tcp, 5671/tcp, 15671/tcp, 15691-15692/tcp, 25672/tcp, 0.0.0.0:15674->5672/tcp, [::]:15674->5672/tcp, 0.0.0.0:15673->15672/tcp, [::]:15673->15672/tcp
+cafe-campus-final-redis          redis:7-alpine                 "docker-entrypoint.s…"   redis           29 minutes ago   Up 29 minutes             0.0.0.0:16379->6379/tcp, [::]:16379->6379/tcp
+cafe-campusmio-gateway-1         node:20-alpine                 "docker-entrypoint.s…"   gateway         11 minutes ago   Up 11 minutes             0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
+cafe-campusmio-ms-inventario-1   node:20-alpine                 "docker-entrypoint.s…"   ms-inventario   11 minutes ago   Up 11 minutes             0.0.0.0:13003->3003/tcp, [::]:13003->3003/tcp, 0.0.0.0:14003->4003/tcp, [::]:14003->4003/tcp
+cafe-campusmio-ms-pedidos-1      node:20-alpine                 "docker-entrypoint.s…"   ms-pedidos      11 minutes ago   Up 11 minutes             0.0.0.0:13002->3002/tcp, [::]:13002->3002/tcp, 0.0.0.0:14002->4002/tcp, [::]:14002->4002/tcp
+cafe-campusmio-ms-productos-1    node:20-alpine                 "docker-entrypoint.s…"   ms-productos    11 minutes ago   Up 11 minutes             0.0.0.0:13001->3001/tcp, [::]:13001->3001/tcp, 0.0.0.0:15051->50051/tcp, [::]:15051->50051/tcp
