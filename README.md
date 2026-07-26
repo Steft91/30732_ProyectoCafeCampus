@@ -77,7 +77,9 @@ docker compose -f docker-compose.final.yml up -d
 docker compose -f docker-compose.final.yml ps
 ```
 
-Si se levanta una base nueva en Docker con el compose final:
+Ese compose final también ejecuta `prisma migrate deploy` en los tres
+microservicios con base de datos. Si se levanta una base nueva, después de que
+los contenedores estén arriba solo falta sembrar datos:
 
 ```bash
 docker compose -f docker-compose.final.yml exec ms-productos npm run seed

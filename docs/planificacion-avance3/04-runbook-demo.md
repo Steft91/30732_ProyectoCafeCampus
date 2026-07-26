@@ -14,10 +14,7 @@ docker compose -f docker-compose.final.yml ps
 Si la base esta nueva:
 
 ```bash
-docker compose -f docker-compose.final.yml exec ms-productos npx prisma migrate deploy --schema src/prisma/schema.prisma
-docker compose -f docker-compose.final.yml exec ms-pedidos npx prisma migrate deploy --schema src/prisma/schema.prisma
-docker compose -f docker-compose.final.yml exec ms-inventario npx prisma migrate deploy --schema src/prisma/schema.prisma
-
+# El compose final ya ejecuta prisma migrate deploy al levantar los servicios.
 docker compose -f docker-compose.final.yml exec ms-productos npm run seed
 docker compose -f docker-compose.final.yml exec -e MS_PRODUCTOS_URL=http://ms-productos:3001 ms-inventario npm run seed
 ```
