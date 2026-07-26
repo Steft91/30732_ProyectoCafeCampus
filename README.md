@@ -71,6 +71,8 @@ docker compose exec ms-inventario npm run seed
 Para la entrega final con JWT/Sentry/RabbitMQ y puertos sin conflicto:
 
 ```bash
+cp .env.example .env
+# Editar .env solo si se quiere activar Sentry o cambiar JWT/delays.
 docker compose -f docker-compose.final.yml up -d
 docker compose -f docker-compose.final.yml ps
 ```

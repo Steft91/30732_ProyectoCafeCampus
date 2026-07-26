@@ -92,6 +92,10 @@ y [`docs/planificacion-avance3/README.md`](docs/planificacion-avance3/README.md)
 
 ## Capturas del tablero
 
+**Avance 1**
+
+![Kanban Avance 1](docs/avance1-evidencias/avance1-kanban.png)
+
 **Avance 2**
 
 ![Kanban Avance 2](docs/avance2-evidencias/avance2-kanban.png)
