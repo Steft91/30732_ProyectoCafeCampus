@@ -1,0 +1,285 @@
+<main class="shell">
+  <section class="hero" aria-labelledby="hero-title">
+    <nav class="topbar">
+      <a class="brand" href="#hero-title" aria-label="Cafe Campus">
+        <span class="brand-mark"><img src="assets/logo-cafe-campus.svg" alt="" aria-hidden="true"></span>
+        <span>
+          <strong>Cafe Campus</strong>
+          <small>Cafeteria universitaria</small>
+        </span>
+      </a>
+
+      <div class="nav-links">
+        <a href="#menu">Menú</a>
+        <a href="#pedido">Pedido</a>
+        <a href="#atencion" *ngIf="puedeAtender()">Atención</a>
+      </div>
+
+      <button class="ghost-button" type="button" (click)="loginAbierto.set(true)" *ngIf="!token()">
+        Iniciar sesión
+      </button>
+      <button class="ghost-button" type="button" (click)="cerrarSesion()" *ngIf="token()">
+        {{ nombreRol() }}
+      </button>
+    </nav>
+
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">café · postres · pedidos rápidos</p>
+        <h1 id="hero-title">Sweet campus moments</h1>
+        <p class="lead">
+          Café recién preparado, snacks de media mañana y postres para acompañar tus pausas entre clases.
+        </p>
+
+        <div class="hero-actions">
+          <a class="primary-button" href="#menu">Ver menú</a>
+          <button class="secondary-button" href="#menu" type="button" (click)="loginAbierto.set(true)">
+            Ordenar ahora
+          </button>
+        </div>
+
+        <div class="status-strip">
+          <span class="pulse"></span>
+          <span>{{ estado() }}</span>
+        </div>
+      </div>
+
+      <div class="hero-visual" aria-label="Ilustracion de taza de cafe">
+        <img src="assets/coffee-hero.svg" alt="Taza de cafe latte en estilo cafeteria artesanal">
+        <a class="floating-note" href="#pedido" [class.has-items]="cantidadItems() > 0">
+          <strong>{{ cantidadItems() }}</strong>
+          <span>{{ total() | currency:'USD':'symbol':'1.2-2' }}</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="feature-row" aria-label="Especialidades de la cafeteria">
+    <article>
+      <span class="feature-icon">01</span>
+      <h2>Café de pausa</h2>
+      <p>Bebidas calientes y frías para estudiar, conversar o seguir el día.</p>
+    </article>
+    <article>
+      <span class="feature-icon">02</span>
+      <h2>Postres suaves</h2>
+      <p>Brownies, muffins y cheesecake listos para acompañar tu bebida.</p>
+    </article>
+    <article>
+      <span class="feature-icon">03</span>
+      <h2>Retiro rápido</h2>
+      <p>Arma tu pedido y revisa cuando este listo para retirar.</p>
+    </article>
+  </section>
+
+  <section class="workspace">
+    <aside class="side-panel" aria-label="Cuenta y pedido" id="pedido">
+      <div class="login-card" *ngIf="loginAbierto()">
+        <div class="panel-header">
+          <span>Acceso</span>
+          <strong>Cuenta </strong>
+        </div>
+
+        <label>
+          Correo
+          <input type="email" [ngModel]="email()" (ngModelChange)="email.set($event)">
+        </label>
+        <label>
+          Clave
+          <input type="password" [ngModel]="password()" (ngModelChange)="password.set($event)">
+        </label>
+
+        <button class="primary-button full" type="button" (click)="login()" [disabled]="cargando()">
+          Entrar
+        </button>
+
+        <div class="demo-list">
+          <button type="button" *ngFor="let cuenta of cuentasDemo" (click)="usarCuenta(cuenta)">
+            <strong>{{ cuenta.label }}</strong>
+            <span>{{ cuenta.email }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="account-card" *ngIf="token() && !loginAbierto()">
+        <div class="panel-header">
+          <span>Cuenta activa</span>
+          <strong>{{ nombreRol() }}</strong>
+        </div>
+        <p *ngIf="rol() === 'estudiante'">Puedes armar pedidos y enviarlos a cafetería.</p>
+        <p *ngIf="rol() === 'personal'">Puedes revisar pedidos y avanzar su preparación.</p>
+        <p *ngIf="rol() === 'admin'">Puedes administrar el menú y supervisar pedidos.</p>
+        <button class="text-button" type="button" (click)="cerrarSesion()">Cambiar cuenta</button>
+      </div>
+
+      <div class="cart-card" *ngIf="puedeComprar()">
+        <div class="panel-header">
+          <span>Pedido actual</span>
+          <strong>{{ total() | currency:'USD':'symbol':'1.2-2' }}</strong>
+        </div>
+
+        <div class="empty empty-cart" *ngIf="carrito().length === 0">
+          <img src="assets/logo-cafe-campus.svg" alt="" aria-hidden="true">
+          <span>Aún no agregas nada.</span>
+        </div>
+
+        <div class="cart-feedback" *ngIf="ultimoAgregado()">{{ ultimoAgregado() }}</div>
+
+        <div class="cart-item" *ngFor="let item of carrito()">
+          <img [src]="productImage(item.producto)" [alt]="imageAlt(item.producto)">
+          <div>
+            <strong>{{ item.producto.nombre }}</strong>
+            <span>{{ item.cantidad }} x {{ precio(item.producto) | currency:'USD':'symbol':'1.2-2' }}</span>
+          </div>
+          <div class="stepper">
+            <button type="button" (click)="quitar(item.producto.id)">-</button>
+            <span>{{ item.cantidad }}</span>
+            <button type="button" (click)="agregar(item.producto)">+</button>
+          </div>
+        </div>
+
+        <button class="primary-button full" type="button" (click)="crearPedido()" [disabled]="cargando()">
+          Enviar pedido
+        </button>
+        <button class="text-button" type="button" (click)="limpiarCarrito()">Limpiar</button>
+      </div>
+
+
+      <div class="admin-card" *ngIf="puedeAdministrar()">
+        <div class="panel-header">
+          <span>Admin</span>
+          <strong>Nuevo producto</strong>
+        </div>
+
+        <label>
+          Nombre
+          <input type="text" [ngModel]="nuevoProductoNombre()" (ngModelChange)="nuevoProductoNombre.set($event)" placeholder="Ej. Mocaccino">
+        </label>
+        <label>
+          Descripción
+          <input type="text" [ngModel]="nuevoProductoDescripcion()" (ngModelChange)="nuevoProductoDescripcion.set($event)" placeholder="Cafe, cacao y leche">
+        </label>
+        <div class="admin-form-row">
+          <label>
+            Precio
+            <input type="number" min="0.01" step="0.01" [ngModel]="nuevoProductoPrecio()" (ngModelChange)="nuevoProductoPrecio.set($event)">
+          </label>
+          <label>
+            Categoría
+            <select [ngModel]="nuevoProductoCategoriaId()" (ngModelChange)="nuevoProductoCategoriaId.set($event)">
+              <option value="" disabled>Elige</option>
+              <option *ngFor="let categoria of categoriasAdmin()" [value]="categoria.id">{{ categoria.nombre }}</option>
+            </select>
+          </label>
+        </div>
+
+        <button class="primary-button full" type="button" (click)="crearProducto()" [disabled]="cargando()">
+          Agregar al menu
+        </button>
+      </div>
+
+      <div class="staff-card" id="atencion" *ngIf="puedeAtender()">
+        <div class="panel-header">
+          <span>Pedidos</span>
+          <button class="mini-button" type="button" (click)="cargarPedidos()">Actualizar</button>
+        </div>
+        <div class="empty" *ngIf="pedidos().length === 0">No hay pedidos por atender.</div>
+        <div class="order-row" *ngFor="let pedidoItem of pedidos().slice(0, 5)">
+          <div>
+            <strong>#{{ pedidoItem.id.slice(0, 8) }}</strong>
+            <span class="status-badge" [ngClass]="estadoClase(pedidoItem.estado)">{{ etiquetaEstado(pedidoItem.estado) }}</span>
+            <span>{{ +pedidoItem.total | currency:'USD':'symbol':'1.2-2' }}</span>
+          </div>
+          <button type="button" (click)="cambiarEstado(pedidoItem, 'EN_PREPARACION')" *ngIf="pedidoItem.estado === 'PENDIENTE'">Preparar</button>
+          <button type="button" (click)="cambiarEstado(pedidoItem, 'LISTO_PARA_RETIRAR')" *ngIf="pedidoItem.estado === 'EN_PREPARACION'">Listo</button>
+        </div>
+      </div>
+
+      <div class="result-card" *ngIf="puedeComprar() && ultimoPedido() as pedidoCreado">
+        <div class="panel-header">
+          <span class="tag">Mi ultimo pedido</span>
+          <button class="mini-button" type="button" (click)="cargarMisPedidos()">Actualizar</button>
+        </div>
+        <strong>#{{ pedidoCreado.id.slice(0, 8) }}</strong>
+        <p>Total {{ +pedidoCreado.total | currency:'USD':'symbol':'1.2-2' }}</p>
+        <span class="status-badge" [ngClass]="estadoClase(pedidoCreado.estado)">{{ etiquetaEstado(pedidoCreado.estado) }}</span>
+      </div>
+
+      <div class="error-card" *ngIf="error()">{{ error() }}</div>
+    </aside>
+
+    <section class="menu-panel" id="menu" aria-labelledby="menu-title">
+      <div class="section-title">
+        <p class="eyebrow">menu</p>
+        <h2 id="menu-title">Favoritos de hoy</h2>
+      </div>
+
+      <div class="locked-menu" *ngIf="!token()">
+        <strong>Inicia sesion para ver el menu disponible.</strong>
+        <span>Usa una cuenta demo para probar compra, atencion o administracion.</span>
+      </div>
+
+      <ng-container *ngIf="token()">
+        <div class="tabs" role="tablist" aria-label="Categorias">
+          <button *ngFor="let categoria of categorias()" type="button" [class.active]="filtro() === categoria" (click)="seleccionarCategoria(categoria)">
+            {{ categoria }}
+          </button>
+        </div>
+
+        <div class="menu-grid">
+          <article class="product-card" *ngFor="let producto of productosFiltrados()" [class.product-paused]="puedeAdministrar() && !producto.disponible">
+            <div class="product-photo">
+              <img [src]="productImage(producto)" [alt]="imageAlt(producto)" loading="lazy">
+              <span *ngIf="!producto.disponible">No disponible</span>
+            </div>
+            <div>
+              <p class="category">{{ producto.categoria?.nombre ?? 'Cafe Campus' }}</p>
+              <h3>{{ producto.nombre }}</h3>
+              <p>{{ producto.descripcion }}</p>
+            </div>
+            <div class="product-footer" *ngIf="!puedeAdministrar()">
+              <div class="price-stack">
+                <span>Precio</span>
+                <strong>{{ precio(producto) | currency:'USD':'symbol':'1.2-2' }}</strong>
+              </div>
+              <button type="button" (click)="agregar(producto)" [disabled]="!producto.disponible || !puedeComprar()">
+                {{ puedeComprar() ? 'Agregar' : 'Solo vista' }}
+              </button>
+            </div>
+
+            <div class="admin-product-actions" *ngIf="puedeAdministrar()">
+              <label>
+                Precio
+                <input type="number" min="0.01" step="0.01" [value]="producto.precio" #precioProducto>
+              </label>
+              <button type="button" (click)="actualizarPrecio(producto, precioProducto.value)">Guardar</button>
+              <button type="button" (click)="alternarDisponibilidad(producto)">
+                {{ producto.disponible ? 'Pausar venta' : 'Activar venta' }}
+              </button>
+              <button class="danger-button" type="button" (click)="eliminarProducto(producto)">Eliminar</button>
+            </div>
+          </article>
+        </div>
+      </ng-container>
+    </section>
+  </section>
+
+  <section class="integration" id="integracion" aria-labelledby="integration-title">
+    <div>
+      <p class="eyebrow">flujo del pedido</p>
+      <h2 id="integration-title">De la mesa a cocina, sin perder el ritmo</h2>
+      <p>
+        Cuando un estudiante envia un pedido, la cafeteria valida el producto, registra la orden y avisa al inventario para mantener el stock al dia.
+      </p>
+    </div>
+
+    <div class="pipeline timeline">
+      <span><b>1</b>Cliente</span>
+      <span><b>2</b>Menú</span>
+      <span><b>3</b>Pedido</span>
+      <span><b>4</b>Cocina</span>
+      <span><b>5</b>Stock</span>
+      <span><b>6</b>Retiro</span>
+    </div>
+  </section>
+</main>
