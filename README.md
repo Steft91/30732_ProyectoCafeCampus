@@ -3,9 +3,11 @@
 > MVP de arquitectura de microservicios · Aplicaciones Distribuidas · 7.º semestre · Entrega por avances.
 
 Cafe Campus es un sistema de cafetería universitaria construido como **monorepo de microservicios**
-(NestJS + TypeScript + Prisma + PostgreSQL). El objetivo pedagógico es analizar diferentes mecanismos de comunicación entre
+(NestJS + TypeScript + Prisma + PostgreSQL) con **frontend Angular** para el demo final.
+El objetivo pedagógico es analizar diferentes mecanismos de comunicación entre
 microservicios, incluyendo TCP, Redis Pub/Sub, gRPC y RabbitMQ, junto con su
-acoplamiento temporal, latencia, contratos y manejo de excepciones.
+acoplamiento temporal, latencia, contratos, seguridad, observabilidad y manejo
+de excepciones.
 
 ## Equipo
 
@@ -26,16 +28,20 @@ en la lógica de negocio.
 - **MS Pedidos:** registra pedidos, consulta Productos mediante gRPC, calcula totales y publica eventos RabbitMQ.
 - **MS Inventario:** controla existencias, procesa eventos Redis y consume eventos RabbitMQ.
 - **API Gateway:** punto único de entrada HTTP, autenticación JWT y proxy hacia los servicios.
+- **Frontend Angular:** interfaz de demo para estudiante, mesero y admin conectada al Gateway.
 
 - **gRPC (Avance 2):** comunicación síncrona con contrato `.proto` entre Pedidos y Productos.
 - **RabbitMQ (Avance 2):** comunicación asíncrona basada en cola entre Pedidos e Inventario.
 
 ## Stack
 
-- **Framework:** NestJS + TypeScript · **Estructura:** monorepo (4 apps independientes).
+- **Frontend:** Angular + TypeScript.
+- **Backend:** NestJS + TypeScript · **Estructura:** monorepo (4 apps independientes).
 - **Síncrono (Avance 1):** TCP con `@nestjs/microservices` · **Eventos (Avance 1):** Redis PUB/SUB.
+- **Avance 2:** gRPC para consulta de productos y RabbitMQ como segundo transporte asíncrono.
 - **Persistencia:** PostgreSQL (un `schema` por servicio) · **ORM:** Prisma.
-- **Seguridad base:** JWT + Guards por rol en el Gateway · **Contenedores:** Docker Compose.
+- **Seguridad y observabilidad:** JWT + Guards por rol en el Gateway · Sentry.
+- **Contenedores:** Docker Compose para backend e infraestructura; frontend local para demo.
 
 > **Equivalencia con lo visto en clase:** la guía sugiere **TypeORM**; este proyecto usa **Prisma**,
 > que cumple el mismo rol de ORM sobre PostgreSQL. El camino síncrono usa **TCP** y el asíncrono
@@ -61,6 +67,38 @@ Si vas a probar el flujo real de pedidos sobre una base limpia, siembra primero:
 docker compose exec ms-productos npm run seed
 docker compose exec ms-inventario npm run seed
 ```
+
+Para la entrega final con JWT/Sentry/RabbitMQ y puertos sin conflicto:
+
+```bash
+docker compose -f docker-compose.final.yml up -d
+docker compose -f docker-compose.final.yml ps
+```
+
+Si se levanta una base nueva en Docker con el compose final:
+
+```bash
+docker compose -f docker-compose.final.yml exec ms-productos npm run seed
+docker compose -f docker-compose.final.yml exec -e MS_PRODUCTOS_URL=http://ms-productos:3001 ms-inventario npm run seed
+```
+
+### Frontend Angular
+
+El frontend se ejecuta localmente y consume el Gateway en `http://localhost:3000/api`:
+
+```bash
+cd frontend
+npm install
+npm run start
+```
+
+Abrir `http://localhost:4200`. Cuentas demo:
+
+| Rol | Correo | Clave | Funcionalidad |
+|---|---|---|---|
+| Estudiante | `estudiante@campus.edu` | `est123` | Menú, carrito, creación de pedido y seguimiento de estado. |
+| Mesero | `personal@campus.edu` | `personal123` | Atención de pedidos y cambio de estados. |
+| Admin | `admin@campus.edu` | `admin123` | Administración de productos y supervisión de pedidos. |
 
 ### Opción B — Local (sin Docker)
 
@@ -90,6 +128,12 @@ cd gateway && npm run start:dev
 | PostgreSQL | 5432 | — |
 | Redis | 6379 | Pub/Sub |
 | RabbitMQ | — | AMQP 5672 |
+| Frontend | 4200 | Angular dev server |
+
+> En `docker-compose.final.yml` se exponen puertos externos alternos para evitar conflictos locales:
+> PostgreSQL `15432`, Redis `16379`, RabbitMQ `15674/15673`, MS Productos `13001/15051`,
+> MS Pedidos `13002/14002` y MS Inventario `13003/14003`.
+
 ## Arquitectura
 
 ![Arquitectura Avance 1](docs/planificacion-avance1/arquitectura-avance1.png)
@@ -169,12 +213,15 @@ sequenceDiagram
 
 ![Kanban Avance 2](docs/avance2-evidencias/avance2-kanban.png)
 
+![Kanban Avance 3](docs/avance3-evidencias/avance3-kanban.png)
+
 - **Ramificación:** **GitHub Flow** — `main` como rama principal y ramas `feat/…`, `chore/…` y `docs/…` para separar funcionalidades, configuración y documentación. Las ramas se integran mediante Pull Requests y se utiliza un **tag por avance**.
 
 ## Patrones y principios aplicados
 
 Resumen (detalle y justificación en
-[`docs/planificacion-avance1/02-patrones-y-principios.md`](docs/planificacion-avance1/02-patrones-y-principios.md)):
+[`docs/planificacion-avance1/02-patrones-y-principios.md`](docs/planificacion-avance1/02-patrones-y-principios.md)
+y [`docs/planificacion-avance2/02-patrones-y-principios.md`](docs/planificacion-avance2/02-patrones-y-principios.md)):
 
 | Patrón / Principio | ¿Framework o equipo? |
 |---|---|
@@ -183,6 +230,11 @@ Resumen (detalle y justificación en
 | DTO, `ValidationPipe`, inyección de dependencias y módulos | Proporcionados por NestJS y utilizados deliberadamente |
 | Excepciones HTTP y manejo controlado de errores | Framework y uso deliberado del equipo |
 | SRP, separación de responsabilidades y aislamiento de datos por `schema` | Diseño del equipo |
+| RPC con contrato gRPC y `.proto` compartido | Equipo, sobre `Transport.GRPC` de NestJS |
+| Pub/Sub sobre cola durable RabbitMQ | Equipo, sobre `Transport.RMQ` de NestJS |
+| JWT + Guards por rol | NestJS + diseño del equipo en Gateway |
+| Observabilidad de errores con Sentry | Equipo, integrado en Gateway |
+| UI por rol conectada al Gateway | Diseño del equipo con Angular |
 ---
 
 ## Avance 1 — Acoplamiento temporal y latencia · `tag v1-avance1`
@@ -386,8 +438,65 @@ Documentación ampliada:
 
 ## Avance 3 — Seguridad, observabilidad e integración (FINAL) · `tag v3-final`
 
-_Pendiente._ Login que emite JWT y Guard que protege rutas (200 con token / 401 sin token / 403 por
-rol), observabilidad con Sentry, integración final y sección de defensa.
+### Seguridad y roles
+
+El Gateway centraliza autenticación y autorización:
+
+- `POST /api/auth/login` emite JWT para usuarios mock de demo.
+- Rutas sin token responden `401 Unauthorized`.
+- Rutas con token válido pero rol insuficiente responden `403 Forbidden`.
+- Rutas con rol autorizado responden correctamente (`200`).
+
+Evidencias:
+
+- Login JWT: [`docs/avance3-evidencias/login-jwt.txt`](docs/avance3-evidencias/login-jwt.txt) · [`png`](docs/avance3-evidencias/login-jwt.png)
+- Ruta autorizada: [`docs/avance3-evidencias/ruta-protegida-200.txt`](docs/avance3-evidencias/ruta-protegida-200.txt) · [`png`](docs/avance3-evidencias/ruta-con-token-valido-200.png)
+- Sin token: [`docs/avance3-evidencias/ruta-sin-token-401.txt`](docs/avance3-evidencias/ruta-sin-token-401.txt) · [`png`](docs/avance3-evidencias/ruta-sin-token-401.png)
+- Rol insuficiente: [`docs/avance3-evidencias/ruta-rol-sin-permiso-403.txt`](docs/avance3-evidencias/ruta-rol-sin-permiso-403.txt) · [`png`](docs/avance3-evidencias/rol-sin-permiso-403.png)
+
+### Observabilidad
+
+El Gateway integra Sentry para capturar errores HTTP relevantes con contexto de
+servicio, ruta, método, estado y entorno. La evidencia usa un error controlado
+de producto inexistente que pasa por Gateway y queda registrado en Sentry.
+
+- Error controlado: [`docs/avance3-evidencias/error-controlado-status.txt`](docs/avance3-evidencias/error-controlado-status.txt)
+- Evento en Sentry: [`docs/avance3-evidencias/avance3-sentry-error-capturado.png`](docs/avance3-evidencias/avance3-sentry-error-capturado.png)
+- Tags/contexto: [`docs/avance3-evidencias/avance3-sentry-tags-contexto.png`](docs/avance3-evidencias/avance3-sentry-tags-contexto.png)
+
+### Integración final
+
+Flujo probado:
+
+```text
+Frontend/Postman -> Gateway JWT -> MS Pedidos -> MS Productos gRPC -> RabbitMQ -> MS Inventario
+```
+
+- Flujo integrado: [`docs/avance3-evidencias/flujo-integrado-final.txt`](docs/avance3-evidencias/flujo-integrado-final.txt) · [`png`](docs/avance3-evidencias/flujo-integrado-final.png)
+- Evento RabbitMQ: [`docs/avance3-evidencias/flujo-integrado-rabbitmq-inventario.txt`](docs/avance3-evidencias/flujo-integrado-rabbitmq-inventario.txt) · [`png`](docs/avance3-evidencias/rabbitmq-recibido-inventario.png)
+- Stack final: [`docs/avance3-evidencias/servicios-finales-ps.txt`](docs/avance3-evidencias/servicios-finales-ps.txt) · [`png`](docs/avance3-evidencias/servicios-finales.png)
+
+### Frontend de demo
+
+Se agregó una interfaz Angular para mostrar el sistema como producto usable, no
+solo como API:
+
+- **Estudiante:** visualiza menú disponible, agrega al carrito, crea pedidos y consulta estado.
+- **Mesero:** revisa pedidos y avanza estados de preparación.
+- **Admin:** crea productos, cambia precio, pausa/activa disponibilidad, elimina productos y supervisa pedidos.
+
+La interfaz consume exclusivamente el Gateway (`/api`) y respeta los permisos
+configurados por rol.
+
+### Kanban final
+
+Captura del tablero actualizado:
+[`docs/avance3-evidencias/avance3-kanban.png`](docs/avance3-evidencias/avance3-kanban.png).
+
+Planificación técnica del avance:
+[`runbook de demo`](docs/planificacion-avance3/01-runbook-demo.md) ·
+[`guion de defensa`](docs/planificacion-avance3/02-guion-defensa.md) ·
+[`planificación final`](docs/planificacion-avance3/README.md).
 
 ### Evidencias post-retroalimentación para iniciar Avance 3
 
@@ -409,7 +518,17 @@ retroalimentación del Avance 2. No reemplazan las evidencias finales del Avance
 
 ## Defensa
 
-_Pendiente (Avance 3)._
+La defensa se centra en explicar por qué cada transporte se usa en un caso
+distinto:
+
+- HTTP para entrada externa y pruebas simples.
+- TCP para benchmark síncrono y demostración de latencia acumulada.
+- Redis Pub/Sub para publicación rápida sin esperar consumidor.
+- gRPC para consulta tipada de productos desde pedidos.
+- RabbitMQ para evento durable de pedido creado hacia inventario.
+
+Además, se demuestra control de acceso en Gateway con JWT/roles, observabilidad
+con Sentry y una interfaz Angular que permite probar los flujos reales por rol.
 
 ## Tags de entrega
 

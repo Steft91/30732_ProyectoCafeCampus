@@ -79,7 +79,50 @@ Contiene:
 
 ---
 
-## Avance 3 — Fixes de arranque
+## Avance 3 — Seguridad, observabilidad e integración final
+
+### Evidencias finales
+
+Carpeta: [`avance3-evidencias/`](avance3-evidencias/)
+
+- [`servicios-finales-ps.txt`](avance3-evidencias/servicios-finales-ps.txt):
+  estado de contenedores del stack final.
+- [`servicios-finales.png`](avance3-evidencias/servicios-finales.png):
+  captura del stack final levantado.
+- [`login-jwt.txt`](avance3-evidencias/login-jwt.txt) y [`login-jwt.png`](avance3-evidencias/login-jwt.png):
+  login exitoso y emisión de JWT.
+- [`ruta-protegida-200.txt`](avance3-evidencias/ruta-protegida-200.txt) y [`ruta-con-token-valido-200.png`](avance3-evidencias/ruta-con-token-valido-200.png):
+  ruta protegida con token válido.
+- [`ruta-sin-token-401.txt`](avance3-evidencias/ruta-sin-token-401.txt) y [`ruta-sin-token-401.png`](avance3-evidencias/ruta-sin-token-401.png):
+  ruta protegida sin token.
+- [`ruta-rol-sin-permiso-403.txt`](avance3-evidencias/ruta-rol-sin-permiso-403.txt) y [`rol-sin-permiso-403.png`](avance3-evidencias/rol-sin-permiso-403.png):
+  rol autenticado sin permiso.
+- [`flujo-integrado-final.txt`](avance3-evidencias/flujo-integrado-final.txt) y [`flujo-integrado-final.png`](avance3-evidencias/flujo-integrado-final.png):
+  creación de pedido desde Gateway con JWT, gRPC y RabbitMQ.
+- [`flujo-integrado-rabbitmq-inventario.txt`](avance3-evidencias/flujo-integrado-rabbitmq-inventario.txt) y [`rabbitmq-recibido-inventario.png`](avance3-evidencias/rabbitmq-recibido-inventario.png):
+  log del evento RabbitMQ consumido por Inventario.
+- [`error-controlado-status.txt`](avance3-evidencias/error-controlado-status.txt):
+  error controlado usado para observabilidad.
+- [`avance3-sentry-error-capturado.png`](avance3-evidencias/avance3-sentry-error-capturado.png):
+  evento capturado en Sentry.
+- [`avance3-sentry-tags-contexto.png`](avance3-evidencias/avance3-sentry-tags-contexto.png):
+  tags y contexto del evento en Sentry.
+- [`avance3-kanban.png`](avance3-evidencias/avance3-kanban.png):
+  captura del tablero Kanban actualizado para el cierre final.
+
+![Kanban Avance 3](avance3-evidencias/avance3-kanban.png)
+
+### Planificación
+
+Carpeta: [`planificacion-avance3/`](planificacion-avance3/)
+
+Contiene:
+
+- runbook de demo;
+- guion de defensa;
+- planificación de cierre final.
+
+### Fixes de arranque
 
 Carpeta: [`avance3-evidencias/fix/`](avance3-evidencias/fix/)
 
