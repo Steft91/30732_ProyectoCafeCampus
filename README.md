@@ -478,6 +478,25 @@ Frontend/Postman -> Gateway JWT -> MS Pedidos -> MS Productos gRPC -> RabbitMQ -
 - Evento RabbitMQ: [`docs/avance3-evidencias/flujo-integrado-rabbitmq-inventario.txt`](docs/avance3-evidencias/flujo-integrado-rabbitmq-inventario.txt) · [`png`](docs/avance3-evidencias/rabbitmq-recibido-inventario.png)
 - Stack final: [`docs/avance3-evidencias/servicios-finales-ps.txt`](docs/avance3-evidencias/servicios-finales-ps.txt) · [`png`](docs/avance3-evidencias/servicios-finales.png)
 
+### Evidencias post-retroalimentación para iniciar Avance 3
+
+Estas capturas documentan que el repositorio quedó estable luego de aplicar la
+retroalimentación del Avance 2. No reemplazan las evidencias finales del Avance
+3; sirven como punto de partida verificable antes de las pruebas visuales del
+frontend.
+
+- [Trazabilidad de correcciones](docs/avance3-evidencias/fix/correcciones-avance2.md)
+
+![Rama y estado Git luego de fixes](docs/avance3-evidencias/fix/fix-rama-avance3.png)
+
+![Stack Docker luego de fixes](docs/avance3-evidencias/fix/fix-docker-healthy.png)
+
+![Pedido exitoso luego de fixes](docs/avance3-evidencias/fix/fix-pedido-exitoso.png)
+
+![Error controlado luego de fixes](docs/avance3-evidencias/fix/fix-error-controlado.png)
+
+![Consumo RabbitMQ luego de fixes](docs/avance3-evidencias/fix/fix-rabbitmq-consumo.png)
+
 ### Frontend de demo
 
 Se agregó una interfaz Angular para mostrar el sistema como producto usable, no
@@ -534,27 +553,11 @@ Captura del tablero actualizado:
 [`docs/avance3-evidencias/avance3-kanban.png`](docs/avance3-evidencias/avance3-kanban.png).
 
 Planificación técnica del avance:
-[`runbook de demo`](docs/planificacion-avance3/01-runbook-demo.md) ·
-[`guion de defensa`](docs/planificacion-avance3/02-guion-defensa.md) ·
+[`roles y Kanban`](docs/planificacion-avance3/01-roles-y-kanban.md) ·
+[`patrones y principios`](docs/planificacion-avance3/02-patrones-y-principios.md) ·
+[`seguridad, observabilidad e integración`](docs/planificacion-avance3/03-seguridad-observabilidad-integracion.md) ·
+[`runbook de demo`](docs/planificacion-avance3/04-runbook-demo.md) ·
 [`planificación final`](docs/planificacion-avance3/README.md).
-
-### Evidencias post-retroalimentación para iniciar Avance 3
-
-Estas capturas documentan que el repositorio quedó estable luego de aplicar la
-retroalimentación del Avance 2. No reemplazan las evidencias finales del Avance
-3; sirven como punto de partida verificable.
-
-- [Trazabilidad de correcciones](docs/avance3-evidencias/fix/correcciones-avance2.md)
-
-![Rama y estado Git luego de fixes](docs/avance3-evidencias/fix/fix-rama-avance3.png)
-
-![Stack Docker luego de fixes](docs/avance3-evidencias/fix/fix-docker-healthy.png)
-
-![Pedido exitoso luego de fixes](docs/avance3-evidencias/fix/fix-pedido-exitoso.png)
-
-![Error controlado luego de fixes](docs/avance3-evidencias/fix/fix-error-controlado.png)
-
-![Consumo RabbitMQ luego de fixes](docs/avance3-evidencias/fix/fix-rabbitmq-consumo.png)
 
 ## Defensa
 

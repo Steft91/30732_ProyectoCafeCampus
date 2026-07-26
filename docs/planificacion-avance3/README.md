@@ -1,51 +1,56 @@
-# Planificacion - Avance 3 Final
+# Planificación — Avance 3 Final (Cafe Campus)
 
-Documentacion de cierre para seguridad, observabilidad, integracion y defensa
-del sistema Cafe Campus.
+Documentación técnica y organizativa del cierre de Cafe Campus: **seguridad (JWT + Guards)**,
+**observabilidad (Sentry)**, **integración final** de todos los transportes y **frontend Angular**
+para la demo, más documentación de apoyo para la defensa ante el jurado.
 
-## Objetivo
+Equipo de 3 integrantes: **Marcos Escobar**, **Mateo Sosa** y **Stefany Díaz**.
 
-Cerrar el proyecto con evidencia de:
+## Objetivo del avance
 
-1. Autenticacion JWT desde el Gateway.
-2. Autorizacion con Guards y roles.
-3. Observabilidad con Sentry.
-4. Flujo integrado entre microservicios y transportes.
-5. Interfaz Angular para demostrar el uso por rol en el demo final.
-6. README final, evidencias, tablero Kanban y tag `v3-final`.
+Cerrar el proyecto con calidad de entrega usando lo visto en clase, sin romper lo de avances previos:
 
-## Alcance tecnico
+1. **Autenticación JWT** en el Gateway: `POST /api/auth/login` emite token firmado (usuarios mock).
+2. **Autorización con Guards**: `JwtAuthGuard` (sin/invalid token → **401**) + `RolesGuard` con
+   `@Roles(...)` (rol insuficiente → **403**).
+3. **Observabilidad con Sentry**: `SentryExceptionFilter` captura excepciones con tags y contexto.
+4. **Integración final**: un pedido real atraviesa JWT → Pedidos → Productos (gRPC) → RabbitMQ →
+   Inventario, con los transportes de avances 1 y 2 conservados y **filtros RPC** que endurecen el arranque.
+5. **Frontend Angular**: SPA de demo con login por rol (estudiante / mesero / admin) que consume el Gateway.
+6. README final consolidado, evidencias, tablero Kanban y **tag `v3-final`**.
 
-| Requisito | Implementacion esperada |
-|---|---|
-| Login JWT | `POST /api/auth/login` valida usuario mock y emite token firmado. |
-| 401 | Rutas protegidas sin token o con token invalido. |
-| 403 | Token valido con rol insuficiente para la ruta. |
-| Sentry | Captura de excepciones con contexto minimo de ruta, metodo y servicio. |
-| Integracion final | Crear pedido desde Gateway: JWT -> Pedidos -> Productos gRPC -> RabbitMQ -> Inventario. |
-| Compose final | `docker-compose.final.yml` con PostgreSQL, Redis, RabbitMQ, Gateway y microservicios. |
-| Frontend | Angular con login demo para estudiante, mesero y admin; consume el Gateway en `http://localhost:3000/api`. |
-| Rol estudiante | Consulta menu disponible, arma carrito, crea pedidos y revisa el ultimo estado. |
-| Rol mesero | Consulta pedidos y avanza estados operativos. |
-| Rol admin | Administra productos del catalogo y supervisa pedidos. |
+| Documento                                                                                   | Contenido                                                                                               |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| [`arquitectura-avance3.puml`](arquitectura-avance3.puml)                                    | **Fuente** del diagrama final (PlantUML): frontend + JWT/Guards + Sentry sobre TCP/Redis/gRPC/RabbitMQ. |
+| [`arquitectura-avance3.png`](arquitectura-avance3.png) · [`.svg`](arquitectura-avance3.svg) | Diagrama **exportado** (el PNG es el que se enlaza en el README).                                       |
+| [`01-roles-y-kanban.md`](01-roles-y-kanban.md)                                              | Roles, propiedad por directorio y reparto **equitativo** de tarjetas Kanban del Avance 3.               |
+| [`02-patrones-y-principios.md`](02-patrones-y-principios.md)                                | Patrones/principios aplicados (framework vs equipo) — criterio C4.                                      |
+| [`03-seguridad-observabilidad-integracion.md`](03-seguridad-observabilidad-integracion.md)  | Análisis de JWT/Guards, Sentry e integración final — criterios C1/C2/C3.                                |
+| [`04-runbook-demo.md`](04-runbook-demo.md)                                                  | Pasos de demo por consola e interfaz para validar seguridad, roles, Sentry y flujo integrado.           |
 
-## Evidencias esperadas
+## Alcance técnico
 
-Guardar en `docs/avance3-evidencias/`:
+| Requisito         | Implementación                                                                                | Evidencia                                                  |
+| ----------------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Login JWT         | `POST /api/auth/login` valida usuario mock y firma token (`JWT_EXPIRES_IN` configurable)      | `login-jwt.txt/.png`                                       |
+| 401               | Ruta protegida sin token o token inválido (`JwtAuthGuard`)                                    | `ruta-sin-token-401.txt/.png`                              |
+| 403               | Token válido con rol insuficiente (`RolesGuard` + `@Roles`)                                   | `ruta-rol-sin-permiso-403.txt/.png`                        |
+| 200               | Ruta protegida con token y rol correcto                                                       | `ruta-protegida-200.txt` / `ruta-con-token-valido-200.png` |
+| Sentry            | `SentryExceptionFilter` con tags (`service`, `http.status_code`) y contexto (`method`, `url`) | `avance3-sentry-*.png`                                     |
+| Integración final | Pedido Gateway → Pedidos → Productos gRPC → RabbitMQ → Inventario                             | `flujo-integrado-final.txt/.png`                           |
+| Compose final     | `docker-compose.final.yml` con JWT/Sentry y puertos sin conflicto                             | `servicios-finales-ps.txt/.png`                            |
+| Frontend          | Angular SPA por rol conectada al Gateway (`http://localhost:3000/api`)                        | capturas del demo                                          |
 
-- `login-jwt.txt`
-- `ruta-protegida-200.txt`
-- `ruta-sin-token-401.txt`
-- `ruta-rol-sin-permiso-403.txt`
-- `flujo-integrado-final.txt`
-- `avance3-sentry-error-capturado.png`
-- `avance3-sentry-tags-contexto.png`
-- `avance3-kanban.png`
-- capturas equivalentes en `.png` si se requiere evidencia visual del frontend.
+## Cómo regenerar el diagrama
 
-## Documentos
+```bash
+# Requiere: plantuml + java + graphviz (dot)
+plantuml -tpng docs/planificacion-avance3/arquitectura-avance3.puml
+plantuml -tsvg docs/planificacion-avance3/arquitectura-avance3.puml
+```
 
-| Documento | Uso |
-|---|---|
-| [`01-runbook-demo.md`](01-runbook-demo.md) | Pasos de ejecucion y pruebas para la demo final. |
-| [`02-guion-defensa.md`](02-guion-defensa.md) | Guion corto para explicar arquitectura, avances y decisiones. |
+## Secuencia de trabajo en una frase
+
+Marcos congela la infraestructura final (compose con JWT/Sentry/puertos) y asegura el Gateway
+(JWT + Sentry) → Mateo endurece los servicios (filtros RPC) y levanta el andamiaje del frontend →
+Stefany implementa la interfaz por roles y documenta/evidencia todo → Marcos etiqueta `v3-final`.

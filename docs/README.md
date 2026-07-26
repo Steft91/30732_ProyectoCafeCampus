@@ -118,9 +118,16 @@ Carpeta: [`planificacion-avance3/`](planificacion-avance3/)
 
 Contiene:
 
-- runbook de demo;
-- guion de defensa;
-- planificación de cierre final.
+- [`01-roles-y-kanban.md`](planificacion-avance3/01-roles-y-kanban.md):
+  roles, reparto de tarjetas y ramas del Avance 3.
+- [`02-patrones-y-principios.md`](planificacion-avance3/02-patrones-y-principios.md):
+  patrones/principios aplicados en seguridad, observabilidad y frontend.
+- [`03-seguridad-observabilidad-integracion.md`](planificacion-avance3/03-seguridad-observabilidad-integracion.md):
+  análisis de JWT/Guards, Sentry y flujo integrado final.
+- [`04-runbook-demo.md`](planificacion-avance3/04-runbook-demo.md):
+  pasos de demo por consola e interfaz.
+- [`README.md`](planificacion-avance3/README.md):
+  índice de planificación del cierre final.
 
 ### Fixes de arranque
 
@@ -142,3 +149,16 @@ final alineado:
   error controlado por producto inexistente.
 - [`fix-rabbitmq-consumo.png`](avance3-evidencias/fix/fix-rabbitmq-consumo.png):
   consumo RabbitMQ confirmado por MS Inventario.
+
+### Evidencias visuales del frontend
+
+Carpeta: [`frontend-evidencias/`](frontend-evidencias/)
+
+Contiene las capturas del flujo visual por rol:
+
+- pantalla inicial y login demo;
+- estudiante: menú, carrito y pedido creado;
+- mesero: gestión y cambio de estado de pedidos;
+- admin: CRUD visual de productos;
+- error controlado visible desde la interfaz;
+- vista del flujo integrado.
