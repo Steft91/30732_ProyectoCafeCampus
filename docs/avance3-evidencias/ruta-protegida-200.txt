@@ -1,0 +1,3 @@
+$ curl /api/pedidos con token admin
+[]
+HTTP_STATUS:200

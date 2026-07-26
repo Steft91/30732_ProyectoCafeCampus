@@ -1,0 +1,104 @@
+@startuml arquitectura-avance3
+' ============================================================
+'  Cafe Campus - Arquitectura Avance 3 (Final integrado)
+'  Seguridad (JWT + Guards), Observabilidad (Sentry),
+'  Frontend Angular e integracion de TODOS los transportes
+'  (TCP + Redis + gRPC + RabbitMQ de los avances 1 y 2).
+'  Render: https://www.plantuml.com/plantuml  (o extension PlantUML en VS Code)
+' ============================================================
+
+title Cafe Campus - Arquitectura Avance 3 (Final)\nFrontend Angular + JWT/Guards + Sentry sobre TCP/Redis/gRPC/RabbitMQ
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam ArrowThickness 1.2
+skinparam component {
+  BorderColor #34495E
+  BackgroundColor #ECF0F1
+}
+skinparam database {
+  BorderColor #34495E
+  BackgroundColor #FDF6E3
+}
+skinparam queue {
+  BorderColor #34495E
+  BackgroundColor #FDEBD0
+}
+skinparam cloud {
+  BorderColor #34495E
+  BackgroundColor #EAF2F8
+}
+
+actor "Cliente\n(Postman / curl)" as cliente
+component "Frontend Angular\nSPA :4200\n(login demo por rol)" as fe
+
+component "API Gateway\nHTTP :3000 (/api)\n<b>JwtAuthGuard (401)</b>\n<b>RolesGuard (403)</b>\n<b>SentryExceptionFilter</b>" as gw
+
+package "Microservicios de dominio" {
+  component "MS Productos\nHTTP :3001\ngRPC servidor :50051\nRpcExceptionFilter" as prod
+  component "MS Pedidos\nHTTP :3002 · TCP :4002\ncliente gRPC + publisher RabbitMQ\nRpcExceptionFilter" as ped
+  component "MS Inventario\nHTTP :3003 · TCP :4003\nRedis sub + consumer RabbitMQ\nRpcExceptionFilter" as inv
+}
+
+artifact "proto/productos.proto\n(contrato gRPC)" as proto
+database "PostgreSQL :5432\n(3 schemas separados)" as pg
+queue "Redis :6379\n(pub/sub, Avance 1)" as redis
+queue "RabbitMQ :5672\ncola durable (Avance 2)" as rabbit
+cloud "Sentry\n(observabilidad)" as sentry
+
+' ---------- NUEVO Avance 3: Frontend + seguridad ----------
+fe -[#8E44AD,bold]-> gw : <color:#8E44AD><b>HTTP + Bearer JWT</b></color>
+cliente --> gw : HTTP REST (Postman/curl)
+note top of gw #E8DAEF
+  SEGURIDAD (Avance 3)
+  POST /api/auth/login emite JWT (usuarios mock).
+  JwtAuthGuard: sin/invalid token => 401.
+  RolesGuard + @Roles: rol insuficiente => 403.
+end note
+
+' ---------- Trafico de dominio (HTTP / axios, proxy) ----------
+gw ..> prod : <color:#2E86C1>HTTP dominio</color>
+gw ..> ped  : <color:#2E86C1>HTTP dominio</color>
+gw ..> inv  : <color:#2E86C1>HTTP dominio</color>
+ped ..> inv : <color:#2E86C1>HTTP validar/descontar stock</color>
+
+' ---------- Persistencia ----------
+prod --> pg
+ped  --> pg
+inv  --> pg
+
+' ---------- Avance 2 conservado: gRPC + RabbitMQ ----------
+proto .[#7D3C98,dashed].> prod
+proto .[#7D3C98,dashed].> ped
+ped -[#7D3C98,bold]-> prod : <color:#7D3C98><b>gRPC ObtenerProducto</b></color>
+ped   -[#B9770E,bold]-> rabbit : <color:#B9770E><b>emit pedido.creado.rabbitmq</b></color>
+rabbit -[#B9770E,bold]-> inv   : <color:#B9770E><b>@EventPattern</b></color>
+
+' ---------- Avance 1 conservado: TCP + Redis (benchmark) ----------
+gw  -[#C0392B]-> ped : <color:#C0392B>TCP benchmark.sync (A1)</color>
+ped -[#C0392B]-> inv : <color:#C0392B>TCP stock-check (A1)</color>
+gw    -[#1E8449]-> redis : <color:#1E8449>emit async (A1)</color>
+redis -[#1E8449]-> inv   : <color:#1E8449>@EventPattern (A1)</color>
+
+' ---------- NUEVO Avance 3: observabilidad ----------
+gw -[#2471A3,bold]-> sentry : <color:#2471A3><b>captureException + tags/context</b></color>
+note right of sentry #EAF2F8
+  OBSERVABILIDAD (Avance 3)
+  SentryExceptionFilter captura excepciones
+  con tags (service, http.status_code) y
+  contexto (method, url). Errores >=500 o
+  SENTRY_CAPTURE_HTTP_ERRORS=true.
+end note
+
+legend right
+  |= Estilo |= Significado |
+  | <color:#8E44AD>__ morado__</color> | **NUEVO** Frontend + JWT/Guards (Avance 3) |
+  | <color:#2471A3>__ azul fuerte__</color> | **NUEVO** Observabilidad Sentry (Avance 3) |
+  | <color:#2E86C1>. . . azul punteado</color> | Trafico de dominio HTTP (proxy) |
+  | <color:#7D3C98>morado</color> | gRPC con contrato (Avance 2) |
+  | <color:#B9770E>ambar</color> | RabbitMQ cola durable (Avance 2) |
+  | <color:#C0392B>rojo</color> · <color:#1E8449>verde</color> | TCP · Redis benchmark (Avance 1) |
+endlegend
+
+@enduml

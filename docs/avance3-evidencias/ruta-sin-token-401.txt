@@ -1,0 +1,3 @@
+$ curl /api/pedidos sin token
+{"message":"Token no proporcionado","error":"Unauthorized","statusCode":401}
+HTTP_STATUS:401

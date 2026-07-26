@@ -79,7 +79,57 @@ Contiene:
 
 ---
 
-## Avance 3 — Fixes de arranque
+## Avance 3 — Seguridad, observabilidad e integración final
+
+### Evidencias finales
+
+Carpeta: [`avance3-evidencias/`](avance3-evidencias/)
+
+- [`servicios-finales-ps.txt`](avance3-evidencias/servicios-finales-ps.txt):
+  estado de contenedores del stack final.
+- [`servicios-finales.png`](avance3-evidencias/servicios-finales.png):
+  captura del stack final levantado.
+- [`login-jwt.txt`](avance3-evidencias/login-jwt.txt) y [`login-jwt.png`](avance3-evidencias/login-jwt.png):
+  login exitoso y emisión de JWT.
+- [`ruta-protegida-200.txt`](avance3-evidencias/ruta-protegida-200.txt) y [`ruta-con-token-valido-200.png`](avance3-evidencias/ruta-con-token-valido-200.png):
+  ruta protegida con token válido.
+- [`ruta-sin-token-401.txt`](avance3-evidencias/ruta-sin-token-401.txt) y [`ruta-sin-token-401.png`](avance3-evidencias/ruta-sin-token-401.png):
+  ruta protegida sin token.
+- [`ruta-rol-sin-permiso-403.txt`](avance3-evidencias/ruta-rol-sin-permiso-403.txt) y [`rol-sin-permiso-403.png`](avance3-evidencias/rol-sin-permiso-403.png):
+  rol autenticado sin permiso.
+- [`flujo-integrado-final.txt`](avance3-evidencias/flujo-integrado-final.txt) y [`flujo-integrado-final.png`](avance3-evidencias/flujo-integrado-final.png):
+  creación de pedido desde Gateway con JWT, gRPC y RabbitMQ.
+- [`flujo-integrado-rabbitmq-inventario.txt`](avance3-evidencias/flujo-integrado-rabbitmq-inventario.txt) y [`rabbitmq-recibido-inventario.png`](avance3-evidencias/rabbitmq-recibido-inventario.png):
+  log del evento RabbitMQ consumido por Inventario.
+- [`error-controlado-status.txt`](avance3-evidencias/error-controlado-status.txt):
+  error controlado usado para observabilidad.
+- [`avance3-sentry-error-capturado.png`](avance3-evidencias/avance3-sentry-error-capturado.png):
+  evento capturado en Sentry.
+- [`avance3-sentry-tags-contexto.png`](avance3-evidencias/avance3-sentry-tags-contexto.png):
+  tags y contexto del evento en Sentry.
+- [`avance3-kanban.png`](avance3-evidencias/avance3-kanban.png):
+  captura del tablero Kanban actualizado para el cierre final.
+
+![Kanban Avance 3](avance3-evidencias/avance3-kanban.png)
+
+### Planificación
+
+Carpeta: [`planificacion-avance3/`](planificacion-avance3/)
+
+Contiene:
+
+- [`01-roles-y-kanban.md`](planificacion-avance3/01-roles-y-kanban.md):
+  roles, reparto de tarjetas y ramas del Avance 3.
+- [`02-patrones-y-principios.md`](planificacion-avance3/02-patrones-y-principios.md):
+  patrones/principios aplicados en seguridad, observabilidad y frontend.
+- [`03-seguridad-observabilidad-integracion.md`](planificacion-avance3/03-seguridad-observabilidad-integracion.md):
+  análisis de JWT/Guards, Sentry y flujo integrado final.
+- [`04-runbook-demo.md`](planificacion-avance3/04-runbook-demo.md):
+  pasos de demo por consola e interfaz.
+- [`README.md`](planificacion-avance3/README.md):
+  índice de planificación del cierre final.
+
+### Fixes de arranque
 
 Carpeta: [`avance3-evidencias/fix/`](avance3-evidencias/fix/)
 
@@ -99,3 +149,16 @@ final alineado:
   error controlado por producto inexistente.
 - [`fix-rabbitmq-consumo.png`](avance3-evidencias/fix/fix-rabbitmq-consumo.png):
   consumo RabbitMQ confirmado por MS Inventario.
+
+### Evidencias visuales del frontend
+
+Carpeta: [`frontend-evidencias/`](frontend-evidencias/)
+
+Contiene las capturas del flujo visual por rol:
+
+- pantalla inicial y login demo;
+- estudiante: menú, carrito y pedido creado;
+- mesero: gestión y cambio de estado de pedidos;
+- admin: CRUD visual de productos;
+- error controlado visible desde la interfaz;
+- vista del flujo integrado.

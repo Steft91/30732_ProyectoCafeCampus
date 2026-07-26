@@ -1,0 +1,4 @@
+$ curl POST /api/pedidos con token estudiante
+PRODUCTO_ID=65d0b467-5359-4032-b3d7-446e2e90256d
+{"id":"ea4c2aca-631a-44de-9d92-14969ce57576","usuarioId":"3","estado":"PENDIENTE","total":"3.8","creadoEn":"2026-07-26T02:07:50.831Z","actualizadoEn":"2026-07-26T02:07:50.831Z","items":[{"id":"2cbeeea7-8d84-45f5-8d65-40ff6bc562a7","pedidoId":"ea4c2aca-631a-44de-9d92-14969ce57576","productoId":"65d0b467-5359-4032-b3d7-446e2e90256d","nombre":"Brownie","precio":"1.9","cantidad":2}]}
+HTTP_STATUS:201

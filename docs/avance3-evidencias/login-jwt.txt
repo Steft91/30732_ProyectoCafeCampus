@@ -1,0 +1,3 @@
+$ curl login estudiante
+{"access_token":"x.xxxxx.xxxx","rol":"estudiante"}
+HTTP_STATUS:200
