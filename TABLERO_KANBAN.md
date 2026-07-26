@@ -9,7 +9,9 @@ URL del tablero/proyectos del repositorio: <https://github.com/users/Steft91/pro
 Cada tarjeta se trabaja en una rama independiente (`feat/…`, `chore/…`, `docs/…`)
 y se integra a `main` mediante Pull Request, conservando la trazabilidad de los cambios. (GitHub Flow). El reparto detallado y la
 propiedad por directorio estan en
-[`docs/planificacion-avance1/01-roles-y-kanban.md`](docs/planificacion-avance1/01-roles-y-kanban.md)
+[`docs/planificacion-avance1/01-roles-y-kanban.md`](docs/planificacion-avance1/01-roles-y-kanban.md),
+[`docs/planificacion-avance2/01-roles-y-kanban.md`](docs/planificacion-avance2/01-roles-y-kanban.md)
+y [`docs/planificacion-avance3/README.md`](docs/planificacion-avance3/README.md).
 
 
 **Responsables:** **M** = Marcos Escobar · **T** = Mateo Sosa · **S** = Stefany Diaz.
@@ -58,22 +60,42 @@ propiedad por directorio estan en
 |---|---|---|---|
 | [x] | Login JWT base en Gateway (mock in-memory) | M | `feat/gateway` (Avance 1) |
 | [x] | Guards por rol en Gateway | M | `feat/gateway` (Avance 1) |
-| [ ] | Login real que emite JWT (200 con token / 401 / 403) | — | `feat/auth` |
-| [ ] | Integrar observabilidad (Sentry) | — | `feat/observabilidad` |
-| [ ] | Integracion final + seccion de defensa | — | `docs/avance3` |
-| [ ] | Crear tag `v3-final` | — | directo en `main` |
+| [x] | Compose final con JWT/Sentry y puertos sin conflicto | M | `chore/compose-final` |
+| [x] | Configurar expiracion JWT por variable `JWT_EXPIRES_IN` | M | `feat/jwt-sentry-gateway` |
+| [x] | Integrar Sentry en Gateway | M | `feat/jwt-sentry-gateway` |
+| [x] | Inicializar Sentry y registrar filtro global | M | `feat/jwt-sentry-gateway` |
+| [x] | Configurar proyecto Angular del demo | T | `feat/frontend-base` |
+| [x] | Agregar identidad visual de cafeteria | T | `feat/frontend-base` |
+| [x] | Implementar interfaz por roles de cafeteria | S | `feat/frontend-roles` |
+| [x] | Evidenciar login que emite JWT | S | `docs/avance3` |
+| [x] | Evidenciar ruta protegida con token valido (200) | S | `docs/avance3` |
+| [x] | Evidenciar ruta sin token o token invalido (401) | S | `docs/avance3` |
+| [x] | Evidenciar rol sin permiso (403) | S | `docs/avance3` |
+| [x] | Capturar error controlado en panel Sentry | S | `docs/avance3` |
+| [x] | Validar flujo final Gateway -> Pedidos -> Productos gRPC -> RabbitMQ -> Inventario | Todos | `docs/avance3` |
+| [x] | Consolidar README final con frontend, arquitectura, excepciones y defensa | S | `docs/avance3` |
+| [x] | Adjuntar captura actualizada del tablero final | S | `docs/avance3` |
+| [ ] | Crear tag `v3-final` | M | directo en `main` |
 
-## Estado del tablero al cierre del Avance 2
-| Backlog | Por hacer | En progreso | En revisión | Hecho |
+## Estado del tablero al cierre del Avance 3
+
+| Backlog | Por hacer | En progreso | En revision | Hecho |
 |---|---|---|---|---|
-| Avance 3: autenticación real | — | — | — | Contrato `.proto` |
-| Avance 3: observabilidad con Sentry | — | — | — | Servidor y cliente gRPC |
-| Avance 3: integración final | — | — | — | RabbitMQ publisher/consumer |
-| — | — | — | — | Error gRPC controlado |
-| — | — | — | — | Evidencias del Avance 2 |
-| — | — | — | — | Tabla comparativa y diagrama |
-| — | — | — | — | Documentación del Avance 2 |
+| — | Tag `v3-final` | — | — | JWT configurable + Guards por rol |
+| — | — | — | — | Evidencias 200/401/403 |
+| — | — | — | — | Sentry integrado y evidenciado |
+| — | — | — | — | Flujo final JWT + gRPC + RabbitMQ |
+| — | — | — | — | Compose final con puertos sin conflicto |
+| — | — | — | — | Frontend Angular por roles |
+| — | — | — | — | Admin de productos desde interfaz |
+| — | — | — | — | README, runbook, guion y tablero actualizados |
 
-> Para cerrar se adjunta la captura del tablero al cierre del Avance 2 en `docs/avance2-evidencias/avance2-kanban.png`.
+## Capturas del tablero
+
+**Avance 2**
 
 ![Kanban Avance 2](docs/avance2-evidencias/avance2-kanban.png)
+
+**Avance 3 final**
+
+![Kanban Avance 3](docs/avance3-evidencias/avance3-kanban.png)
