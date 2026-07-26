@@ -7,7 +7,7 @@ Guia corta para ensayar la exposicion final.
 ```bash
 cp .env.example .env
 # Editar .env solo si se quiere activar Sentry o cambiar JWT/delays.
-docker compose -f docker-compose.final.yml up -d
+docker compose -f docker-compose.final.yml up -d --build
 docker compose -f docker-compose.final.yml ps
 ```
 

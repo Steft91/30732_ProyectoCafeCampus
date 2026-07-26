@@ -442,6 +442,18 @@ Documentación ampliada:
 
 ## Avance 3 — Seguridad, observabilidad e integración (FINAL) · `tag v3-final`
 
+### Diagrama final del sistema integrado
+
+El cierre integra el frontend Angular, el Gateway con JWT/Guards/Sentry y los
+transportes de los avances previos: TCP, Redis Pub/Sub, gRPC y RabbitMQ.
+
+![Arquitectura Avance 3 Final](docs/planificacion-avance3/arquitectura-avance3.png)
+
+> Fuente PlantUML:
+> [`docs/planificacion-avance3/arquitectura-avance3.puml`](docs/planificacion-avance3/arquitectura-avance3.puml)
+> · versión vectorial:
+> [`docs/planificacion-avance3/arquitectura-avance3.svg`](docs/planificacion-avance3/arquitectura-avance3.svg).
+
 ### Seguridad y roles
 
 El Gateway centraliza autenticación y autorización:
@@ -467,6 +479,24 @@ de producto inexistente que pasa por Gateway y queda registrado en Sentry.
 - Error controlado: [`docs/avance3-evidencias/error-controlado-status.txt`](docs/avance3-evidencias/error-controlado-status.txt)
 - Evento en Sentry: [`docs/avance3-evidencias/avance3-sentry-error-capturado.png`](docs/avance3-evidencias/avance3-sentry-error-capturado.png)
 - Tags/contexto: [`docs/avance3-evidencias/avance3-sentry-tags-contexto.png`](docs/avance3-evidencias/avance3-sentry-tags-contexto.png)
+
+### Manejo de excepciones consolidado
+
+La entrega final mantiene una estrategia honesta por capa:
+
+- **Gateway HTTP:** `JwtAuthGuard` responde `401` cuando no hay token o el token
+  es inválido; `RolesGuard` responde `403` cuando el usuario autenticado no tiene
+  el rol requerido.
+- **Observabilidad:** `SentryExceptionFilter` captura en Sentry los errores HTTP
+  relevantes del Gateway con `service`, `http.status_code`, método y URL. Si no
+  existe `SENTRY_DSN`, la integración queda en modo no-op para no romper local.
+- **Microservicios:** `RpcExceptionFilter` está registrado en los transportes de
+  `ms-productos` (gRPC), `ms-pedidos` (TCP) y `ms-inventario` (TCP/Redis/RabbitMQ).
+- **Dominio:** un producto inexistente viaja como `RpcException(NOT_FOUND)` desde
+  Productos y se traduce en Pedidos a `422 Unprocessable Entity`, sin tumbar los
+  servicios.
+- **Consistencia operativa:** si el descuento de stock falla después de crear el
+  pedido, Pedidos compensa marcando el pedido como `CANCELADO`.
 
 ### Integración final
 
@@ -563,8 +593,21 @@ Planificación técnica del avance:
 
 ## Defensa
 
-La defensa se centra en explicar por qué cada transporte se usa en un caso
-distinto:
+Guion sugerido para 8–10 diapositivas más demo en vivo:
+
+1. Portada: Cafe Campus, integrantes y roles.
+2. Problema y dominio del MVP: catálogo, pedidos e inventario de cafetería.
+3. Arquitectura general: diagrama final con Gateway, microservicios, frontend y transportes.
+4. Avance 1: latencia y acoplamiento temporal entre TCP síncrono y Redis asíncrono.
+5. Avance 2: gRPC para consulta tipada de productos y RabbitMQ como evento durable.
+6. Avance 3: JWT, Guards por rol y Sentry.
+7. Temas de clase aplicados: patrones, SOLID, transportes y manejo de excepciones.
+8. Demo en vivo siguiendo [`docs/planificacion-avance3/04-runbook-demo.md`](docs/planificacion-avance3/04-runbook-demo.md).
+9. Conclusiones y aprendizajes.
+10. Cierre y preguntas.
+
+Durante la defensa, la explicación central es por qué cada transporte se usa en
+un caso distinto:
 
 - HTTP para entrada externa y pruebas simples.
 - TCP para benchmark síncrono y demostración de latencia acumulada.
@@ -574,6 +617,16 @@ distinto:
 
 Además, se demuestra control de acceso en Gateway con JWT/roles, observabilidad
 con Sentry y una interfaz Angular que permite probar los flujos reales por rol.
+
+Preguntas probables y respuestas guía:
+
+- **¿Qué información viaja en el JWT?** `sub`, `email`, `rol`, fecha de emisión y expiración; el Gateway valida firma y vigencia con `JWT_SECRET`.
+- **¿Qué hace un Guard en NestJS?** Decide si una petición continúa al controlador; a diferencia de un middleware, puede leer metadatos del handler como `@Roles`.
+- **¿Autenticación vs autorización?** Autenticación prueba quién eres (`401` si falla); autorización decide qué puedes hacer (`403` si el rol no alcanza).
+- **¿Por qué gRPC y no TCP/eventos para Productos?** Porque Pedidos necesita una respuesta inmediata, tipada y basada en contrato `.proto` para nombre/precio/disponibilidad.
+- **¿Por qué RabbitMQ y no Redis para pedido creado?** Porque RabbitMQ usa cola durable y es mejor para eventos de negocio que no deberían perderse si el consumidor cae.
+- **¿Qué registra Sentry?** Errores HTTP relevantes del Gateway con servicio, status, método y URL; se evidencia con un error controlado de producto inexistente.
+- **¿Qué patrones son del framework y cuáles del equipo?** NestJS aporta Guards, filtros, DI y módulos; el equipo diseñó la cadena JWT→Roles, filtros RPC, proxy Gateway y composición de transportes.
 
 ## Tags de entrega
 
