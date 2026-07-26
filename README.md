@@ -490,6 +490,44 @@ solo como API:
 La interfaz consume exclusivamente el Gateway (`/api`) y respeta los permisos
 configurados por rol.
 
+#### Evidencias visuales del flujo frontend
+
+Carpeta: [`docs/frontend-evidencias/`](docs/frontend-evidencias/)
+
+- [`00.pantalla.inicio.png`](docs/frontend-evidencias/00.pantalla.inicio.png): vista inicial del frontend.
+- [`01-login-demo.png`](docs/frontend-evidencias/01-login-demo.png): acceso con cuentas demo.
+- [`02-estudiante-menu.png`](docs/frontend-evidencias/02-estudiante-menu.png): menú visible para estudiante.
+- [`03-estudiante-carrito.png`](docs/frontend-evidencias/03-estudiante-carrito.png): carrito con productos agregados.
+- [`04-estudiante-pedido-creado.png`](docs/frontend-evidencias/04-estudiante-pedido-creado.png): pedido creado desde la interfaz.
+- [`05-mesero-pedidos.png`](docs/frontend-evidencias/05-mesero-pedidos.png): vista operativa de pedidos para mesero.
+- [`06-mesero-cambio-estado.png`](docs/frontend-evidencias/06-mesero-cambio-estado.png): cambio de estado del pedido.
+- [`07-admin-productos-crud.png`](docs/frontend-evidencias/07-admin-productos-crud.png): CRUD visual de productos para admin.
+- [`08-admin-nuevo-producto.png`](docs/frontend-evidencias/08-admin-nuevo-producto.png): creación de producto desde admin.
+- [`09-error-visual-controlado.png`](docs/frontend-evidencias/09-error-visual-controlado.png): error controlado visible en la interfaz.
+- [`10-flujo-integracion-visual.png`](docs/frontend-evidencias/10-flujo-integracion-visual.png): sección visual del flujo integrado.
+
+![Pantalla inicial del frontend](docs/frontend-evidencias/00.pantalla.inicio.png)
+
+![Login demo por rol](docs/frontend-evidencias/01-login-demo.png)
+
+![Menú estudiante](docs/frontend-evidencias/02-estudiante-menu.png)
+
+![Carrito estudiante](docs/frontend-evidencias/03-estudiante-carrito.png)
+
+![Pedido creado desde frontend](docs/frontend-evidencias/04-estudiante-pedido-creado.png)
+
+![Pedidos para mesero](docs/frontend-evidencias/05-mesero-pedidos.png)
+
+![Cambio de estado por mesero](docs/frontend-evidencias/06-mesero-cambio-estado.png)
+
+![CRUD visual de productos admin](docs/frontend-evidencias/07-admin-productos-crud.png)
+
+![Nuevo producto admin](docs/frontend-evidencias/08-admin-nuevo-producto.png)
+
+![Error visual controlado](docs/frontend-evidencias/09-error-visual-controlado.png)
+
+![Flujo integrado visual](docs/frontend-evidencias/10-flujo-integracion-visual.png)
+
 ### Kanban final
 
 Captura del tablero actualizado:
