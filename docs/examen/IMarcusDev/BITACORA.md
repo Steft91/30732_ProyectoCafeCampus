@@ -30,9 +30,10 @@
 |---|---|---|
 | `initSentry`, con inicialización condicional al DSN | `gateway/src/observability/sentry.ts:3` y la guarda de la línea 6 | Se replicó la misma firma y la misma guarda en el módulo equivalente de ms-inventario, en lugar de inventar otro mecanismo de arranque. |
 | `SentryExceptionFilter`, convención de etiquetas del Gateway | `gateway/src/common/filters/sentry-exception.filter.ts:24` | Se tomó como referencia de convención. La etiqueta `service` mantiene el mismo nombre y el mismo propósito en ms-inventario. |
-| `RpcExceptionFilter` de ms-inventario | `ms-inventario/src/common/filters/rpc-exception.filter.ts:5` | Se extendió este filtro. No se creó uno paralelo. |
-| Registro del filtro sobre los tres transportes | `ms-inventario/src/main.ts:23`, `:32` y `:44` | Esos tres registros ya distinguían el transporte. Se aprovecharon para inyectar el valor de la etiqueta `transport`. |
-| Consumidor del evento `pedido.creado.rabbitmq` | `ms-inventario/src/modules/eventos/pedidos-rabbitmq.controller.ts:21` | Es el punto donde se agregó el breadcrumb y el contexto de operación, sobre el manejador que ya existía. |
+| `RpcExceptionFilter` de ms-inventario | `ms-inventario/src/common/filters/rpc-exception.filter.ts:5` | Se extendió este filtro (ahora `@Catch()` en lugar de `@Catch(RpcException)`, con un parámetro de transporte). No se creó uno paralelo. |
+| Registro previo del filtro por transporte, `useGlobalFilters()` sobre cada microservicio | `ms-inventario/src/main.ts:26`, `:35` y `:47` (versión anterior al sprint 2) | Se verificó que este registro nunca surtió efecto: `connectMicroservice()` vincula los handlers antes de que el código pueda llamar `.useGlobalFilters()` sobre la instancia devuelta. Se sustituyó por `@UseFilters()` en cada controlador, mecanismo que sí se resuelve a tiempo. |
+| Consumidor del evento `pedido.creado.rabbitmq` | `ms-inventario/src/modules/eventos/pedidos-rabbitmq.controller.ts:21` (ahora con `@UseFilters(new RpcExceptionFilter('rabbitmq'))`) | Se agregó el decorador sobre el controlador existente, sin tocar la lógica del manejador. El contexto de operación y la correlación se agregan en el sprint 3. |
+| `BenchmarkTcpController` y `BenchmarkEventsController`, controladores TCP y Redis ya existentes | `ms-inventario/src/modules/benchmark/benchmark.tcp.controller.ts:9` y `benchmark.events.controller.ts:11` | Se agregó el mismo decorador `@UseFilters()`, con `'tcp'` y `'redis'` respectivamente, para que los tres transportes reales del servicio queden cubiertos de forma simétrica. |
 
 **¿Qué convención del repositorio seguí para que mi código no desentone?**
 
@@ -55,6 +56,11 @@
 - **Qué decidí:** Regenerar `ms-inventario/package-lock.json` con `npm install --package-lock-only` en un contenedor efímero, en lugar de forzar el arranque con `npm install` en el `command` del servicio o editar el lockfile a mano.
 - **Alternativa que descarté:** Cambiar el `command` de `docker-compose.final.yml` de `npm ci` a `npm install`, que habría evitado el error sin regenerar nada.
 - **Por qué:** Modificar el comando de arranque del compose afecta a los cuatro servicios y excede el alcance de la actividad. Regenerar el lockfile resuelve el problema en el archivo correcto y mantiene `npm ci` como el mecanismo de instalación reproducible que ya usa el resto del stack.
+
+### Decisión 3
+- **Qué decidí:** Sustituir el registro de filtros mediante `microservice.useGlobalFilters()` en `main.ts` por el decorador `@UseFilters()` aplicado directamente sobre cada controlador (`PedidosRabbitmqController`, `BenchmarkTcpController`, `BenchmarkEventsController`), en lugar de mantener el mecanismo original.
+- **Alternativa que descarté:** Conservar `useGlobalFilters()` y asumir que capturaba las excepciones, sin verificarlo en tiempo de ejecución.
+- **Por qué:** Al reproducir el caso de la fase 0 después de conectar el filtro, este no se invocó (comprobado con una traza temporal en el propio `catch()`). La causa es que `NestApplicationContext.connectMicroservice()` vincula los handlers de patrón de forma síncrona dentro de esa misma llamada, antes de que `main.ts` pueda invocar `.useGlobalFilters()` sobre la instancia devuelta. Esto significa que el registro original del repositorio (ya presente antes de esta actividad, en las líneas 26, 35 y 47 de la versión previa de `main.ts`) nunca capturó nada. Se optó por `@UseFilters()`, que sí se resuelve a tiempo porque su metadato se lee directamente del controlador, verificado de punta a punta contra el panel de Sentry.
 
 ---
 

@@ -1,5 +1,6 @@
-import { Controller, Logger } from '@nestjs/common';
+import { Controller, Logger, UseFilters } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
+import { RpcExceptionFilter } from '../../common/filters/rpc-exception.filter';
 
 type PedidoCreadoRabbitmqEvent = {
   pedidoId: string;
@@ -15,6 +16,7 @@ type PedidoCreadoRabbitmqEvent = {
 };
 
 @Controller()
+@UseFilters(new RpcExceptionFilter('rabbitmq'))
 export class PedidosRabbitmqController {
   private readonly logger = new Logger(PedidosRabbitmqController.name);
 
