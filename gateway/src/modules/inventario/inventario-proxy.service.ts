@@ -29,15 +29,18 @@ export class InventarioProxyService {
     return this.request('GET', '/inventario/alertas/bajo-stock');
   }
 
+  // Solicitud global del servicio para obtener el error por parte de Axios
   private async request(method: string, path: string, data?: unknown) {
     try {
       const response = await axios({ method, url: `${MS_INVENTARIO_URL}${path}`, data });
+      
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError;
+      const axiosError = error as AxiosError;  // Parse a Axios por códigos de error existentes
       const status = axiosError.response?.status ?? HttpStatus.INTERNAL_SERVER_ERROR;
       const message = (axiosError.response?.data as any)?.message ?? 'Error en MS Inventario';
-      throw new HttpException(message, status);
+
+      throw new HttpException(message, 404);  // Excepción con código obtenido de axios.status
     }
   }
 }

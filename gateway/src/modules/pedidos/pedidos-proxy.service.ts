@@ -30,15 +30,18 @@ export class PedidosProxyService {
     return this.request('PATCH', `/pedidos/${id}/cancelar`, { usuarioId });
   }
 
+  // Solicitud global del servicio para obtener el error por parte de Axios
   private async request(method: string, path: string, data?: unknown) {
     try {
       const response = await axios({ method, url: `${MS_PEDIDOS_URL}${path}`, data });
+
       return response.data;
-    } catch (error) {
-      const axiosError = error as AxiosError;
-      const status = axiosError.response?.status ?? HttpStatus.INTERNAL_SERVER_ERROR;
+    } catch (error) {  // Si existiese error
+      const axiosError = error as AxiosError;  // Parse a Axios por códigos de error existentes
+      const status = axiosError.response?.status ?? HttpStatus.INTERNAL_SERVER_ERROR;  // Error Axios
       const message = (axiosError.response?.data as any)?.message ?? 'Error en MS Pedidos';
-      throw new HttpException(message, status);
+
+      throw new HttpException(message, status);  // Excepción con código obtenido de axios.status
     }
   }
 }

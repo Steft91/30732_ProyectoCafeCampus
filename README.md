@@ -649,3 +649,7 @@ Preguntas probables y respuestas guía:
 - `v1-avance1` — 2026-07-14
 - `v2-avance2` — 2026-07-21 (tag retaggeado con correcciones, commit `c2c861e`)
 - `v3-final` — previsto para 2026-07-26 tras merge a `main` y tag de release
+
+## Examen Final - Mateo Sosa
+
+[Bitácora](./docs/examen/matsosa1/BITACORA.md)
