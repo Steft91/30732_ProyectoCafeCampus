@@ -10,7 +10,7 @@ type PedidoCreadoAsyncEvent = {
 };
 
 @Controller()
-@UseFilters(new RpcExceptionFilter('redis'))
+@UseFilters(new RpcExceptionFilter('redis', 'BenchmarkEventsController.handlePedidoCreado'))
 export class BenchmarkEventsController {
   private readonly logger = new Logger(BenchmarkEventsController.name);
 

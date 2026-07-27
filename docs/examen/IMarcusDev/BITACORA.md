@@ -37,11 +37,16 @@
 
 **¿Qué convención del repositorio seguí para que mi código no desentone?**
 
-*(Se completa al cierre del sprint 3.)*
+La misma convención de tags que ya usa `SentryExceptionFilter` del Gateway (`scope.setTag`,
+`scope.setContext`, dentro de `Sentry.withScope`), extendida con `transport` y `pedido_id` para
+cubrir lo que un microservicio necesita y el Gateway no. Detalle completo en
+[`anexos/01-convencion-observabilidad.md`](anexos/01-convencion-observabilidad.md).
 
 **¿Qué NO dupliqué, pudiendo hacerlo?**
 
-*(Se completa al cierre del sprint 3.)*
+No creé un segundo filtro para agregar contexto; se extendió el mismo `RpcExceptionFilter` del
+sprint 2. Tampoco generé un identificador de correlación nuevo: se reutilizó `pedidoId`, que
+ms-pedidos y el Gateway ya generan aguas arriba.
 
 ---
 
@@ -62,21 +67,44 @@
 - **Alternativa que descarté:** Conservar `useGlobalFilters()` y asumir que capturaba las excepciones, sin verificarlo en tiempo de ejecución.
 - **Por qué:** Al reproducir el caso de la fase 0 después de conectar el filtro, este no se invocó (comprobado con una traza temporal en el propio `catch()`). La causa es que `NestApplicationContext.connectMicroservice()` vincula los handlers de patrón de forma síncrona dentro de esa misma llamada, antes de que `main.ts` pueda invocar `.useGlobalFilters()` sobre la instancia devuelta. Esto significa que el registro original del repositorio (ya presente antes de esta actividad, en las líneas 26, 35 y 47 de la versión previa de `main.ts`) nunca capturó nada. Se optó por `@UseFilters()`, que sí se resuelve a tiempo porque su metadato se lee directamente del controlador, verificado de punta a punta contra el panel de Sentry.
 
+### Decisión 4
+- **Qué decidí:** Pasar el nombre del handler (`'PedidosRabbitmqController.handlePedidoCreado'`, etc.) como segundo parámetro del constructor de `RpcExceptionFilter`, en lugar de obtenerlo dinámicamente desde `ArgumentsHost`.
+- **Alternativa que descarté:** Leer `host.getClass()` y `host.getHandler()` dentro del filtro para derivar el nombre de la operación automáticamente.
+- **Por qué:** Se verificó en `node_modules/@nestjs/microservices/context/rpc-proxy.js` que, en el camino de manejo de errores RPC, el `ExecutionContextHost` se construye solo con los argumentos de la llamada (`new ExecutionContextHost(args)`), sin `constructorRef` ni `handler`; ambos métodos devuelven `null`. Intentar leerlos habría fallado en silencio. Pasar el nombre como dato conocido en el sitio de registro es correcto y no depende de un detalle interno del framework que además resultó no funcionar como se esperaba.
+
 ---
 
 ## 4. Las 3 preguntas de mi actividad
 
 **Pregunta 1: ¿Por qué la inicialización debe ser no-op cuando no hay DSN en vez de fallar al arrancar?**
 
-> *(pendiente, fase final)*
+> Porque la observabilidad es una capacidad secundaria del servicio, no una dependencia dura de su
+> función. Si `initSentry()` lanzara una excepción sin DSN, un entorno local o de desarrollo sin
+> cuenta de Sentry no podría levantar ms-inventario, y el equipo perdería la posibilidad de correr
+> el stack sin depender de un servicio externo de terceros. Esto se verificó en el sprint 1
+> ejecutando `initSentry('ms-inventario')` con `SENTRY_DSN` vacío dentro del propio contenedor: el
+> servicio arrancó sin lanzar, igual que ya hacía el Gateway.
 
 **Pregunta 2: ¿Qué información nunca debe llegar a Sentry desde un sistema con datos de usuarios, y qué hiciste concretamente para impedirlo?**
 
-> *(pendiente, fase final)*
+> Identificadores de usuario, credenciales y cualquier dato personal. En este sistema, el payload
+> del evento `pedido.creado.rabbitmq` trae `usuarioId`, y el manejador ya lo escribía en el log
+> del servicio (`pedidos-rabbitmq.controller.ts:26`). La función `sanear()` en
+> `rpc-exception.filter.ts` reemplaza ese campo (y `password`, `token`, `email`, si estuvieran
+> presentes) por `'[REDACTED]'` antes de adjuntar el payload al breadcrumb. Se verificó en el panel
+> de Sentry que el evento capturado muestra `usuarioId: [REDACTED]`, mientras que `pedidoId` (un
+> identificador interno, no un dato personal) llega en claro porque es lo que permite correlacionar
+> el error con el pedido de origen.
 
 **Pregunta 3: ¿Qué diferencia hay entre un tag y un contexto en Sentry, y por qué elegiste precisamente esos tags?**
 
-> *(pendiente, fase final)*
+> Un tag es un par clave-valor indexado y buscable: Sentry permite filtrar y agrupar issues por él
+> (por ejemplo, ver todos los errores con `transport=rabbitmq`). Un contexto es un objeto más rico,
+> visible en el detalle del evento, pero no indexado para búsqueda. Por eso `service`, `transport`
+> y `pedido_id` son tags (son exactamente los criterios por los que se necesita filtrar: qué
+> servicio, por qué transporte, de qué pedido), mientras que el nombre completo del handler
+> (`operacion.handler`) va como contexto, porque es información de detalle que no tendría sentido
+> buscar de forma masiva.
 
 ---
 

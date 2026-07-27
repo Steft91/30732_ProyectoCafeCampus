@@ -8,7 +8,7 @@ type BenchmarkPayload = {
 };
 
 @Controller()
-@UseFilters(new RpcExceptionFilter('tcp'))
+@UseFilters(new RpcExceptionFilter('tcp', 'BenchmarkTcpController.checkStock'))
 export class BenchmarkTcpController {
   @MessagePattern('benchmark.stock-check')
   async checkStock(@Payload() payload: BenchmarkPayload) {

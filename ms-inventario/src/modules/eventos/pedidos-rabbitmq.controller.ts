@@ -16,7 +16,7 @@ type PedidoCreadoRabbitmqEvent = {
 };
 
 @Controller()
-@UseFilters(new RpcExceptionFilter('rabbitmq'))
+@UseFilters(new RpcExceptionFilter('rabbitmq', 'PedidosRabbitmqController.handlePedidoCreado'))
 export class PedidosRabbitmqController {
   private readonly logger = new Logger(PedidosRabbitmqController.name);
 
