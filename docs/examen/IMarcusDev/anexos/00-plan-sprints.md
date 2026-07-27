@@ -156,3 +156,4 @@ proporcionó, no de una referencia consultable en el repositorio versionado.
 | Fecha | Fase | Cambio respecto a lo planificado |
 |---|---|---|
 | 2026-07-27 | Fase 0 | Versión inicial del plan. |
+| 2026-07-27 | Sprint 1 | Se agregó `ms-inventario/package-lock.json` a la lista de archivos modificados, no prevista en la tabla 4. Al incorporar `@sentry/node` en `package.json`, el comando `npm ci` que ejecuta el contenedor exige que el lockfile esté sincronizado, por lo que fue necesario regenerarlo con `npm install --package-lock-only` antes de recrear el contenedor. |
