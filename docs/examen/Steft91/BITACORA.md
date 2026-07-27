@@ -10,8 +10,8 @@
 | **Actividad asignada** | C - Consumidor asíncrono idempotente |
 | **Rama** | `exam/Steft91` |
 | **Tag** | `examen-Steft91` |
-| **Pull Request** | Pendiente |
-| **Tarjeta Kanban** | En progreso. Evidencia inicial: `kanban-actividad-proceso.png`. |
+| **Pull Request** | https://github.com/Steft91/30732_ProyectoCafeCampus/pull/25 |
+| **Tarjeta Kanban** | Movida a Hecho con enlace al PR. Evidencias: `kanban-actividad-proceso.png` y `kanban-examen-Steft91.png`. |
 | **Hiciste el Paso 0?** | No aplica. La actividad C no tiene Paso 0; el repositorio ya publica eventos RabbitMQ desde Pedidos hacia Inventario. |
 
 ---
@@ -97,6 +97,7 @@ La principal corrección fue no afirmar que antes ya existía un efecto duplicad
 | `despues-evento-duplicado.png` | Captura visual de la prueba posterior: log de duplicado descartado y/o consulta con un solo registro. |
 | `prueba-idempotencia.txt` | Salida de build y prueba automatizada de idempotencia. |
 | `kanban-actividad-proceso.png` | Captura de mi tarjeta Kanban de la actividad C en progreso. |
+| `kanban-examen-Steft91.png` | Captura final de la tarjeta Kanban en Hecho con el PR enlazado. |
 
 **Cómo reproducir mi cambio desde cero:**
 
@@ -142,11 +143,11 @@ OK - idempotencia RabbitMQ validada
 - La prueba automatizada `test:idempotencia` pasa.
 
 **No funciona / quedo incompleto:**
-- La parte técnica de la actividad C está completa según las pruebas realizadas. Quedan pendientes los pasos administrativos finales: abrir PR, enlazar tarjeta Kanban, completar esos enlaces en esta bitácora y crear/subir el tag.
+- La parte técnica de la actividad C está completa según las pruebas realizadas. Al momento de este cierre queda pendiente crear y subir el tag `examen-Steft91`.
 
 **Cuál era mi siguiente paso:**
 
-Abrir el Pull Request de `exam/Steft91` hacia `main`, mover mi tarjeta Kanban a Hecho con enlace al PR, actualizar esta bitácora con esos enlaces y publicar el tag `examen-Steft91`.
+Crear y subir el tag `examen-Steft91` apuntando al último commit de la rama.
 
 ---
 
