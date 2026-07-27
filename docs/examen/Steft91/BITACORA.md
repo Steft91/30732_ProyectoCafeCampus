@@ -90,7 +90,8 @@ Pendiente de completar durante la implementacion si aparece una suposicion incor
 |---|---|
 | `antes-evento-duplicado.txt` | Antes del cambio, el mismo evento RabbitMQ `pedido.creado.rabbitmq` llega dos veces al consumidor y se registra dos veces en logs. |
 | `antes-evento-duplicado.png` | Captura visual del mismo comportamiento previo: dos logs para el mismo `pedidoId`. |
-| `despues-evento-duplicado.txt` | Pendiente. |
+| `despues-evento-duplicado.txt` | Despues del cambio, el mismo evento se procesa una vez, el duplicado se descarta con log y la BD muestra un solo registro. |
+| `prueba-idempotencia.txt` | Salida de build y prueba automatizada de idempotencia. |
 
 **Como reproducir mi cambio desde cero:**
 
@@ -104,15 +105,15 @@ Pendiente de completar durante la implementacion si aparece una suposicion incor
 
 | | |
 |---|---|
-| **Archivo de la prueba** | Pendiente |
-| **Comando para ejecutarla** | Pendiente |
-| **Que verifica** | Pendiente |
-| **Falla sin mi cambio?** | Pendiente |
+| **Archivo de la prueba** | `ms-inventario/src/modules/eventos/pedidos-rabbitmq.service.spec.ts` |
+| **Comando para ejecutarla** | `docker compose -f docker-compose.final.yml exec -T ms-inventario npm run test:idempotencia` |
+| **Que verifica** | Evento duplicado deja un registro; eventos distintos dejan dos; payload invalido se descarta. |
+| **Falla sin mi cambio?** | Si. Sin el servicio de idempotencia y la persistencia de claves no existe el comportamiento `duplicado` ni el registro unico. |
 
 Salida de la prueba pasando:
 
 ```text
-Pendiente.
+OK - idempotencia RabbitMQ validada
 ```
 
 ---

@@ -1,0 +1,56 @@
+# Prueba automatizada - idempotencia del consumidor RabbitMQ
+
+Fecha: 2026-07-27
+Rama: exam/Steft91
+
+## Build de ms-inventario
+
+```bash
+docker compose -f docker-compose.final.yml exec -T ms-inventario npm run build
+```
+
+Salida:
+
+```text
+> cafe-campus-ms-inventario@1.0.0 build
+> nest build
+```
+
+## Build de ms-pedidos
+
+```bash
+docker compose -f docker-compose.final.yml exec -T ms-pedidos npm run build
+```
+
+Salida:
+
+```text
+> cafe-campus-ms-pedidos@1.0.0 build
+> nest build
+```
+
+## Prueba automatizada
+
+```bash
+docker compose -f docker-compose.final.yml exec -T ms-inventario npm run test:idempotencia
+```
+
+Salida:
+
+```text
+> cafe-campus-ms-inventario@1.0.0 test:idempotencia
+> ts-node src/modules/eventos/pedidos-rabbitmq.service.spec.ts
+
+[PedidosRabbitmqService] Evento RabbitMQ procesado: pedido=pedido-duplicado, usuario=Steft91, total=7.5, items=1, idempotencyKey=pedido.creado.rabbitmq:pedido-duplicado
+[PedidosRabbitmqService] Evento RabbitMQ duplicado descartado: idempotencyKey=pedido.creado.rabbitmq:pedido-duplicado
+[PedidosRabbitmqService] Evento RabbitMQ procesado: pedido=pedido-uno, usuario=Steft91, total=7.5, items=1, idempotencyKey=pedido.creado.rabbitmq:pedido-uno
+[PedidosRabbitmqService] Evento RabbitMQ procesado: pedido=pedido-dos, usuario=Steft91, total=7.5, items=1, idempotencyKey=pedido.creado.rabbitmq:pedido-dos
+[PedidosRabbitmqService] Evento RabbitMQ descartado por payload invalido: pedidoId es obligatorio
+OK - idempotencia RabbitMQ validada
+```
+
+## Que verifica
+
+- Procesar dos veces el mismo evento deja un solo registro.
+- Dos eventos distintos dejan dos registros.
+- Un payload invalido se descarta sin crear registros ni tumbar el proceso.

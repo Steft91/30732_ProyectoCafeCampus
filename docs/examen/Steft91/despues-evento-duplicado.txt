@@ -1,0 +1,62 @@
+# Evidencia despues - evento RabbitMQ duplicado con idempotencia
+
+Fecha: 2026-07-27
+Rama: exam/Steft91
+Actividad: C - Consumidor asincrono idempotente
+
+## Migracion aplicada
+
+```bash
+docker compose -f docker-compose.final.yml exec -T ms-inventario npx prisma migrate deploy --schema src/prisma/schema.prisma
+```
+
+Salida relevante:
+
+```text
+Applying migration `20260727123000_eventos_procesados`
+All migrations have been successfully applied.
+```
+
+## Evento con idempotencyKey publicado dos veces
+
+```bash
+docker compose -f docker-compose.final.yml exec -T ms-inventario node -e "const { ClientProxyFactory, Transport } = require('@nestjs/microservices'); const { firstValueFrom, timeout } = require('rxjs'); const client = ClientProxyFactory.create({ transport: Transport.RMQ, options: { urls: ['amqp://guest:guest@rabbitmq:5672'], queue: 'cafe_campus_pedidos', queueOptions: { durable: true } } }); const evento = { idempotencyKey: 'pedido.creado.rabbitmq:exam-duplicado-despues-Steft91', pedidoId: 'exam-duplicado-despues-Steft91', usuarioId: 'Steft91', total: 7.5, items: [{ productoId: 'producto-demo-examen', nombre: 'Cafe examen', precio: 7.5, cantidad: 1 }], creadoEn: new Date().toISOString() }; (async () => { await firstValueFrom(client.emit('pedido.creado.rabbitmq', evento).pipe(timeout(3000))); await firstValueFrom(client.emit('pedido.creado.rabbitmq', evento).pipe(timeout(3000))); await client.close(); console.log('Evento con idempotencyKey publicado 2 veces:', JSON.stringify(evento)); })().catch((error) => { console.error(error); process.exit(1); });"
+```
+
+Salida:
+
+```text
+Evento con idempotencyKey publicado 2 veces: {"idempotencyKey":"pedido.creado.rabbitmq:exam-duplicado-despues-Steft91","pedidoId":"exam-duplicado-despues-Steft91","usuarioId":"Steft91","total":7.5,"items":[{"productoId":"producto-demo-examen","nombre":"Cafe examen","precio":7.5,"cantidad":1}],"creadoEn":"2026-07-27T12:38:54.944Z"}
+```
+
+## Logs del consumidor
+
+```bash
+docker compose -f docker-compose.final.yml logs --tail=40 ms-inventario
+```
+
+Salida relevante:
+
+```text
+[PedidosRabbitmqService] Evento RabbitMQ procesado: pedido=exam-duplicado-despues-Steft91, usuario=Steft91, total=7.5, items=1, idempotencyKey=pedido.creado.rabbitmq:exam-duplicado-despues-Steft91
+[PedidosRabbitmqService] Evento RabbitMQ duplicado descartado: idempotencyKey=pedido.creado.rabbitmq:exam-duplicado-despues-Steft91
+```
+
+## Consulta a la base de datos
+
+```bash
+docker compose -f docker-compose.final.yml exec -T postgres psql -U postgres -d cafe_campus -c "SELECT clave, tipo, \"referenciaId\", COUNT(*) OVER () AS total_registros FROM inventario_schema.eventos_procesados WHERE clave = 'pedido.creado.rabbitmq:exam-duplicado-despues-Steft91';"
+```
+
+Salida:
+
+```text
+                         clave                         |          tipo          |          referenciaId          | total_registros 
+-------------------------------------------------------+------------------------+--------------------------------+-----------------
+ pedido.creado.rabbitmq:exam-duplicado-despues-Steft91 | pedido.creado.rabbitmq | exam-duplicado-despues-Steft91 |               1
+(1 row)
+```
+
+## Conclusion
+
+Despues del cambio, el mismo evento publicado dos veces produce un solo registro persistido en `inventario_schema.eventos_procesados` y el duplicado se descarta con log controlado.
