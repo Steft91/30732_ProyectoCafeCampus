@@ -14,16 +14,20 @@ type PedidoCreadoRabbitmqEvent = {
   }>;
   creadoEn: string;
 };
+import { Controller } from '@nestjs/common';
+import { EventPattern, Payload } from '@nestjs/microservices';
+import {
+  PedidoCreadoRabbitmqEvent,
+  PedidosRabbitmqService,
+} from './pedidos-rabbitmq.service';
 
 @Controller()
 @UseFilters(new RpcExceptionFilter('rabbitmq', 'PedidosRabbitmqController.handlePedidoCreado'))
 export class PedidosRabbitmqController {
-  private readonly logger = new Logger(PedidosRabbitmqController.name);
+  constructor(private readonly pedidosRabbitmqService: PedidosRabbitmqService) {}
 
   @EventPattern('pedido.creado.rabbitmq')
-  handlePedidoCreado(@Payload() evento: PedidoCreadoRabbitmqEvent) {
-    this.logger.log(
-      `Evento RabbitMQ recibido: pedido=${evento.pedidoId}, usuario=${evento.usuarioId}, total=${evento.total}, items=${evento.items.length}`,
-    );
+  async handlePedidoCreado(@Payload() evento: PedidoCreadoRabbitmqEvent) {
+    await this.pedidosRabbitmqService.procesarPedidoCreado(evento);
   }
 }

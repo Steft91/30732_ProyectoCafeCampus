@@ -591,6 +591,22 @@ Planificación técnica del avance:
 [`runbook de demo`](docs/planificacion-avance3/04-runbook-demo.md) ·
 [`planificación final`](docs/planificacion-avance3/README.md).
 
+## Examen final
+
+### Examen final — Stefany Díaz
+
+Actividad asignada: **C - Consumidor asíncrono idempotente**.
+
+Se endurece el consumidor RabbitMQ existente de Inventario para que el evento
+`pedido.creado.rabbitmq` sea idempotente: el publisher envía una
+`idempotencyKey`, el consumer persiste claves procesadas en PostgreSQL y los
+duplicados se descartan con log controlado.
+
+- Bitácora individual: [`docs/examen/Steft91/BITACORA.md`](docs/examen/Steft91/BITACORA.md)
+- Evidencia antes: [`antes-evento-duplicado.txt`](docs/examen/Steft91/antes-evento-duplicado.txt) · [`antes-evento-duplicado.png`](docs/examen/Steft91/antes-evento-duplicado.png)
+- Evidencia después: [`despues-evento-duplicado.txt`](docs/examen/Steft91/despues-evento-duplicado.txt) · [`despues-evento-duplicado.png`](docs/examen/Steft91/despues-evento-duplicado.png)
+- Prueba automatizada: [`prueba-idempotencia.txt`](docs/examen/Steft91/prueba-idempotencia.txt)
+
 ## Defensa
 
 Guion sugerido para 8–10 diapositivas más demo en vivo:

@@ -1,0 +1,53 @@
+# Evidencia antes - evento RabbitMQ duplicado sin idempotencia
+
+Fecha: 2026-07-27
+Rama: exam/Steft91
+Actividad: C - Consumidor asincrono idempotente
+
+## Contexto
+
+Antes del cambio, el consumidor RabbitMQ existente en `ms-inventario` solo registra el evento recibido en logs.
+No persiste una clave de idempotencia ni descarta duplicados.
+
+## Consumidor listo
+
+```bash
+docker compose -f docker-compose.final.yml logs --tail=220 ms-inventario
+```
+
+Salida relevante:
+
+```text
+MS Inventario RabbitMQ conectado a amqp://guest:guest@rabbitmq:5672
+```
+
+## Evento duplicado publicado
+
+Se publico dos veces el mismo evento `pedido.creado.rabbitmq` contra la cola real `cafe_campus_pedidos`.
+
+```bash
+docker compose -f docker-compose.final.yml exec -T ms-inventario node -e "const { ClientProxyFactory, Transport } = require('@nestjs/microservices'); const { firstValueFrom, timeout } = require('rxjs'); const client = ClientProxyFactory.create({ transport: Transport.RMQ, options: { urls: ['amqp://guest:guest@rabbitmq:5672'], queue: 'cafe_campus_pedidos', queueOptions: { durable: true } } }); const evento = { pedidoId: 'exam-duplicado-antes-Steft91', usuarioId: 'Steft91', total: 7.5, items: [{ productoId: 'producto-demo-examen', nombre: 'Cafe examen', precio: 7.5, cantidad: 1 }], creadoEn: new Date().toISOString() }; (async () => { await firstValueFrom(client.emit('pedido.creado.rabbitmq', evento).pipe(timeout(3000))); await firstValueFrom(client.emit('pedido.creado.rabbitmq', evento).pipe(timeout(3000))); await client.close(); console.log('Evento duplicado publicado 2 veces:', JSON.stringify(evento)); })().catch((error) => { console.error(error); process.exit(1); });"
+```
+
+Salida:
+
+```text
+Evento duplicado publicado 2 veces: {"pedidoId":"exam-duplicado-antes-Steft91","usuarioId":"Steft91","total":7.5,"items":[{"productoId":"producto-demo-examen","nombre":"Cafe examen","precio":7.5,"cantidad":1}],"creadoEn":"2026-07-27T12:29:07.705Z"}
+```
+
+## Resultado antes del cambio
+
+```bash
+docker compose -f docker-compose.final.yml logs --tail=80 ms-inventario
+```
+
+Salida relevante:
+
+```text
+[PedidosRabbitmqController] Evento RabbitMQ recibido: pedido=exam-duplicado-antes-Steft91, usuario=Steft91, total=7.5, items=1
+[PedidosRabbitmqController] Evento RabbitMQ recibido: pedido=exam-duplicado-antes-Steft91, usuario=Steft91, total=7.5, items=1
+```
+
+## Conclusion
+
+El mismo evento fue aceptado/procesado dos veces por el consumidor. Este es el comportamiento previo que justifica agregar idempotencia en el consumer.
