@@ -20,7 +20,16 @@
 
 ## 1. Qué construí
 
-*(Se completa al cierre del sprint 4, con lo que efectivamente quedó implementado.)*
+Antes de esta actividad, ms-inventario no tenía ningún código de observabilidad: solo el Gateway
+capturaba errores hacia Sentry, y únicamente los que llegaban por HTTP. Ahora ms-inventario
+inicializa Sentry de forma condicional al DSN y captura las excepciones de sus tres transportes
+reales (TCP, Redis, RabbitMQ) con las etiquetas `service` y `transport`, un identificador de
+correlación (`pedido_id`), contexto de la operación ejecutada y un breadcrumb con el payload que
+originó el error, saneando antes cualquier dato personal. En el camino se encontró y corrigió un
+bug preexistente del repositorio: el filtro de excepciones que ya existía nunca se había ejecutado,
+en ningún transporte, porque su mecanismo de registro (`useGlobalFilters()` llamado después de
+`connectMicroservice()`) llega estructuralmente tarde en NestJS. Quedó pendiente la prueba
+automatizada (sección 7 y 8).
 
 ---
 
@@ -132,38 +141,85 @@ propia herramienta descrito en la sección 3 del anexo 02.
 |---|---|
 | `antes-error-sin-captura.txt` | Lado de la consola. Línea base verificada por comandos: el DSN sí estaba inyectado en el contenedor, el paquete `@sentry/node` no estaba instalado y el código fuente no contenía referencias a Sentry. Incluye el `TypeError` provocado y la salida completa del servicio. |
 | `antes-panel-sentry-vacio.png` | Lado del panel. Proyecto `node-xc` de la organización `espe-h6`, filtro `is:unresolved` sobre las últimas 24 horas, sin ningún evento recibido. Sentry muestra el asistente de instalación del SDK, lo que confirma que el proyecto nunca recibió un evento. |
-| `despues-panel-sentry.png` | *(pendiente, fase final)* |
-| `despues-tags-contexto.png` | *(pendiente, fase final)* |
+| `despues-panel-sentry.png` | Panel de Sentry, evento `TypeError` del issue `NODE-XC-1`, con 2 ocurrencias registradas (fase 0 y sprint 2/3). |
+| `despues-tags-contexto.png` | Detalle del mismo evento: sección Tags (`service=ms-inventario`, `transport=rabbitmq`, `pedido_id=EXAM-D-SPRINT3-001`) y sección Contexts (`operacion` con `handler=PedidosRabbitmqController.handlePedidoCreado` y `pedidoId`). |
 
-Las dos evidencias previas son complementarias y cubren los dos extremos que
-pide la actividad. El archivo en texto demuestra que el error ocurrió y que solo
-quedó registrado en la salida del contenedor. La imagen demuestra que ese mismo
-error no llegó al panel, pese a que el DSN estaba configurado.
+Las evidencias antes/después son complementarias y cubren los dos extremos que
+pide la actividad. El archivo en texto y la imagen previa demuestran que el
+error ocurrió y no llegó al panel pese al DSN configurado. Las dos imágenes
+finales demuestran que, tras la implementación, el mismo tipo de error llega al
+panel con tags y contexto completos, y que el dato sensible (`usuarioId`) no
+viaja en claro (verificado en el breadcrumb del evento, visible al abrir el
+issue completo en Sentry).
 
-Sobre la imagen conviene una aclaración. El bloque titulado «Preview a Sentry
-Issue», ubicado a la derecha, corresponde a una demostración de la propia
-interfaz de Sentry y no a eventos del proyecto. Los identificadores que allí
-aparecen pertenecen a otros lenguajes y marcos de trabajo. El estado real del
-proyecto es el que indica el mensaje principal, «Your code sleuth eagerly awaits
-its first mission», junto con los tres pasos de instalación del SDK.
+Sobre `antes-panel-sentry-vacio.png` conviene una aclaración. El bloque titulado
+«Preview a Sentry Issue», ubicado a la derecha, corresponde a una demostración
+de la propia interfaz de Sentry y no a eventos del proyecto. Los identificadores
+que allí aparecen pertenecen a otros lenguajes y marcos de trabajo. El estado
+real del proyecto es el que indica el mensaje principal, «Your code sleuth
+eagerly awaits its first mission», junto con los tres pasos de instalación del
+SDK.
 
 **Cómo reproducir mi cambio desde cero:**
 
 ```bash
-# (se completa al cierre del sprint 4, con los comandos verificados)
+cp .env.example .env
+# Editar .env y colocar un SENTRY_DSN real (proyecto Node.js en Sentry).
+docker compose -f docker-compose.final.yml up -d
+
+curl -u guest:guest -X POST \
+  http://localhost:15673/api/exchanges/%2F/amq.default/publish \
+  -H "Content-Type: application/json" \
+  -d '{"properties":{},"routing_key":"cafe_campus_pedidos","payload_encoding":"string","payload":"{\"pattern\":\"pedido.creado.rabbitmq\",\"data\":{\"pedidoId\":\"cualquier-id\",\"usuarioId\":\"3\",\"total\":4.5,\"creadoEn\":\"2026-01-01T00:00:00.000Z\"}}"}'
+
+# Esperar ~1 minuto (retraso de ingesta de Sentry) y revisar el panel:
+# tags service=ms-inventario, transport=rabbitmq, pedido_id=<el id enviado>;
+# contexto "operacion"; breadcrumb con usuarioId como [REDACTED].
 ```
 
 ---
 
 ## 7. Prueba automatizada
 
-*(Se completa al cierre del sprint 4.)*
+| | |
+|---|---|
+| **Archivo de la prueba** | No existe. |
+| **Comando para ejecutarla** | `` |
+| **Qué verifica** | — |
+| **¿Falla sin mi cambio?** | No aplica. |
+
+**No se implementó por falta de tiempo dentro del bloque de 2 horas.** El sprint 4 planificado en
+[`anexos/00-plan-sprints.md`](anexos/00-plan-sprints.md) preveía instalar Jest en ms-inventario
+(el servicio no tenía ningún framework de pruebas configurado) y verificar dos casos: que
+`initSentry()` no lanza sin `SENTRY_DSN`, y que `RpcExceptionFilter.catch()` llama a
+`Sentry.captureException` con los tags correctos y sin `usuarioId` en claro. Ambos casos sí se
+verificaron manualmente (sección 6 y anexo 01), pero no quedaron como prueba automatizada
+reproducible. Esto limita el criterio C3 de la rúbrica, que exige explícitamente al menos una
+prueba que falle sin el cambio y pase con él.
 
 ---
 
 ## 8. Estado final — honesto
 
-*(Se completa en la fase final.)*
+**Funciona:**
+- Inicialización condicional de Sentry en ms-inventario (no-op sin DSN, verificado).
+- Captura de excepciones en los tres transportes reales del servicio (TCP, Redis, RabbitMQ) mediante `@UseFilters()`, con tags `service` y `transport`.
+- Contexto de operación (`handler`), identificador de correlación (`pedido_id`) y breadcrumb con el payload saneado.
+- Saneo de `usuarioId` (y de `password`/`token`/`email` si aparecieran) antes de que cualquier dato llegue a Sentry.
+- Evidencia antes/después verificada de punta a punta contra un proyecto real de Sentry (`node-xc`, organización `espe-h6`), no solo por lectura de código.
+- Se detectó y corrigió un bug preexistente en el repositorio (el registro de filtros por `useGlobalFilters()` en `main.ts` nunca funcionó, en ningún transporte, desde antes de esta actividad).
+
+**No funciona / quedó incompleto:**
+- No hay prueba automatizada (sección 7). Es la pieza pendiente más importante de la actividad.
+- El saneo de datos sensibles (`sanear()`) cubre una lista fija de campos (`usuarioId`, `password`, `token`, `email`); no es una solución genérica para cualquier campo sensible futuro.
+- No se instrumentó el módulo HTTP de `InventarioController` (solo los tres controladores con patrones RPC), porque ningún error de ese módulo pasó por el punto ciego que motivó la actividad.
+
+**Cuál era mi siguiente paso:**
+
+Instalar Jest en `ms-inventario` (siguiendo el mismo criterio de import mínimo que ya usa el resto
+del stack) y escribir dos pruebas unitarias: una para `initSentry()` (no-op sin DSN) y otra para
+`RpcExceptionFilter.catch()` (captura con los tags correctos y sin datos sensibles), tal como
+detalla el sprint 4 del plan.
 
 ---
 

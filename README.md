@@ -633,3 +633,10 @@ Preguntas probables y respuestas guía:
 - `v1-avance1` — 2026-07-14
 - `v2-avance2` — 2026-07-21 (tag retaggeado con correcciones, commit `c2c861e`)
 - `v3-final` — previsto para 2026-07-26 tras merge a `main` y tag de release
+
+### Examen final — Marcos Escobar
+
+Actividad D — Observabilidad con contexto en un microservicio, instrumentando ms-inventario (antes
+sin ninguna integración de Sentry) sobre sus tres transportes reales (TCP, Redis, RabbitMQ).
+Bitácora completa, con anclaje al código preexistente, decisiones técnicas y evidencia antes/después:
+[`docs/examen/IMarcusDev/BITACORA.md`](docs/examen/IMarcusDev/BITACORA.md).

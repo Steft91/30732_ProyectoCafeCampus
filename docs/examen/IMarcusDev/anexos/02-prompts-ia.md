@@ -89,6 +89,8 @@ que exige el criterio C2 de la rúbrica. Esa regla permitió además detectar el
 error de la herramienta en la cita de `sentry-exception.filter.ts`, registrado en
 la entrada 3 de la tabla 2.
 
+| 10 | El autor ordenó pasar directamente a la fase final, omitiendo el sprint 4 por falta de tiempo, e indicó declarar esa omisión con honestidad en la bitácora. Solicitó además los comandos para etiquetar la rama al cierre. | Capturó la evidencia "después" contra el proyecto real de Sentry (panel y detalle de tags/contexto), completó las secciones 1, 6, 7 y 8 de la bitácora dejando registrada sin ambigüedad la ausencia de la prueba automatizada y su efecto sobre el criterio C3, y preparó los comandos de commit final y de etiquetado. | El autor decidió priorizar evidencia y documentación honesta sobre completar la prueba automatizada, dado el tiempo restante del bloque de dos horas. |
+
 ## 5. Registro de cambios
 
 **Tabla 3.** Control de cambios
