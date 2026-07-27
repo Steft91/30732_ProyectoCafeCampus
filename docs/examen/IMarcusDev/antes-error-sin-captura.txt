@@ -1,0 +1,64 @@
+===============================================================================
+ EVIDENCIA ANTES - Actividad D: Observabilidad con contexto en un microservicio
+ Servicio instrumentado: ms-inventario
+ Fecha de captura: 2026-07-27 07:53:57 -05
+ Rama: exam/IMarcusDev   Commit base: ecfe1c6
+===============================================================================
+
+--- 1. CONDICIONES DE LA LINEA BASE ---------------------------------------
+
+1.1 El DSN de Sentry SI esta configurado dentro del contenedor:
+    SENTRY_DSN=https://***CLAVE_OCULTA***@o4511580688154624.ingest.us.sentry.io/4511807347621888
+    SENTRY_ENVIRONMENT=avance3-final
+
+    Origen: docker-compose.final.yml lineas 99-100.
+    Por lo tanto, la ausencia del evento en el panel NO se explica por falta
+    de credencial, sino por ausencia de codigo que la utilice.
+
+1.2 El paquete @sentry/node NO esta instalado en el servicio:
+    node_modules/@sentry: no existe
+
+1.3 El codigo fuente no contiene ninguna referencia a Sentry:
+    coincidencias de 'sentry' en ms-inventario/src = 0
+
+--- 2. ERROR PROVOCADO ------------------------------------------------------
+
+Se publico un evento 'pedido.creado.rabbitmq' sin la propiedad 'items' en la
+cola cafe_campus_pedidos. El manejador accede a evento.items.length en
+ms-inventario/src/modules/eventos/pedidos-rabbitmq.controller.ts:24 sin validar
+la existencia del arreglo, por lo que lanza un TypeError no controlado.
+
+Comando ejecutado:
+  curl -u guest:guest -X POST http://localhost:15673/api/exchanges/%2F/amq.default/publish \
+    -H 'Content-Type: application/json' \
+    -d '{"properties":{},"routing_key":"cafe_campus_pedidos","payload_encoding":"string","payload":"{...sin items...}"}'
+
+Respuesta de RabbitMQ: {"routed":true}
+
+--- 3. SALIDA DEL SERVICIO (unico lugar donde queda registro) ----------------
+
+ms-inventario-1  | [Nest] 247  - 07/27/2026, 12:53:57 PM   ERROR [RpcExceptionsHandler] Cannot read properties of undefined (reading 'length')
+ms-inventario-1  | TypeError: Cannot read properties of undefined (reading 'length')
+ms-inventario-1  |     at PedidosRabbitmqController.handlePedidoCreado (/app/src/modules/eventos/pedidos-rabbitmq.controller.ts:24:134)
+ms-inventario-1  |     at /app/node_modules/@nestjs/microservices/context/rpc-context-creator.js:44:33
+ms-inventario-1  |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+ms-inventario-1  |     at async /app/node_modules/@nestjs/microservices/context/rpc-proxy.js:11:32
+ms-inventario-1  |     at async ServerRMQ.handleEvent (/app/node_modules/@nestjs/microservices/server/server.js:74:32)
+
+--- 4. RESULTADO ------------------------------------------------------------
+
+El error quedo unicamente en la salida del contenedor. No se genero ningun
+evento en el panel de Sentry, pese a que el DSN estaba configurado (punto 1.1).
+
+Observacion relevante: la excepcion fue atendida por RpcExceptionsHandler, el
+manejador por defecto de NestJS, y no por el filtro propio del repositorio.
+El filtro declara @Catch(RpcException) en
+ms-inventario/src/common/filters/rpc-exception.filter.ts:5, por lo que un
+TypeError queda fuera de su alcance.
+
+Captura complementaria del panel vacio: antes-panel-sentry-vacio.png
+  Proyecto: node-xc   Organizacion: espe-h6
+  Filtro aplicado: is:unresolved, All Envs, ultimas 24 horas
+  Estado mostrado: asistente de instalacion del SDK, sin eventos recibidos.
+  Nota: el bloque "Preview a Sentry Issue" de la derecha es una demostracion de
+  la interfaz de Sentry, no corresponde a eventos de este proyecto.
