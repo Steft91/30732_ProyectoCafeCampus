@@ -183,6 +183,7 @@ export class PedidosService implements OnModuleInit {
     await firstValueFrom(
       this.rabbitClient
         .emit('pedido.creado.rabbitmq', {
+          idempotencyKey: `pedido.creado.rabbitmq:${pedidoId}`,
           pedidoId,
           usuarioId,
           total,

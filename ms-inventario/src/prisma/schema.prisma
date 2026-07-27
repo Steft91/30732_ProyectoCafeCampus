@@ -36,3 +36,14 @@ model Movimiento {
 
   @@map("movimientos")
 }
+
+model EventoProcesado {
+  id           String   @id @default(uuid())
+  clave        String   @unique
+  tipo         String
+  referenciaId String?
+  payload      String?
+  creadoEn     DateTime @default(now())
+
+  @@map("eventos_procesados")
+}
