@@ -4,8 +4,11 @@ import { ValidationPipe } from '@nestjs/common';
 import { Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
 import { RpcExceptionFilter } from './common/filters/rpc-exception.filter';
+import { initSentry } from './observability/sentry';
 
 async function bootstrap() {
+  initSentry('ms-inventario');
+
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(

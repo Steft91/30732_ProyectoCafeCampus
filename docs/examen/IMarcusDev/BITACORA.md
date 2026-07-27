@@ -46,7 +46,15 @@
 
 ## 3. Decisiones técnicas
 
-*(Se completa al cierre de los sprints 2 y 3.)*
+### Decisión 1
+- **Qué decidí:** Replicar de forma idéntica el módulo `initSentry` del Gateway (`gateway/src/observability/sentry.ts`) en `ms-inventario/src/observability/sentry.ts`, cambiando únicamente el parámetro `serviceName` a `'ms-inventario'`, en lugar de escribir una inicialización distinta para el microservicio.
+- **Alternativa que descarté:** Diseñar una función de inicialización propia para ms-inventario, con otra forma de leer el DSN o de decidir el modo no-op.
+- **Por qué:** El enunciado exige integrarse con el repositorio existente, no crear una pieza paralela. El Gateway ya resolvió correctamente el caso borde exigido (no-op sin DSN), así que duplicar esa solución exacta evita introducir una segunda convención de arranque en el mismo sistema.
+
+### Decisión 2
+- **Qué decidí:** Regenerar `ms-inventario/package-lock.json` con `npm install --package-lock-only` en un contenedor efímero, en lugar de forzar el arranque con `npm install` en el `command` del servicio o editar el lockfile a mano.
+- **Alternativa que descarté:** Cambiar el `command` de `docker-compose.final.yml` de `npm ci` a `npm install`, que habría evitado el error sin regenerar nada.
+- **Por qué:** Modificar el comando de arranque del compose afecta a los cuatro servicios y excede el alcance de la actividad. Regenerar el lockfile resuelve el problema en el archivo correcto y mantiene `npm ci` como el mecanismo de instalación reproducible que ya usa el resto del stack.
 
 ---
 
