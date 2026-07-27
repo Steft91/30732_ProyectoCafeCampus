@@ -91,6 +91,7 @@ Pendiente de completar durante la implementacion si aparece una suposicion incor
 | `antes-evento-duplicado.txt` | Antes del cambio, el mismo evento RabbitMQ `pedido.creado.rabbitmq` llega dos veces al consumidor y se registra dos veces en logs. |
 | `antes-evento-duplicado.png` | Captura visual del mismo comportamiento previo: dos logs para el mismo `pedidoId`. |
 | `despues-evento-duplicado.txt` | Despues del cambio, el mismo evento se procesa una vez, el duplicado se descarta con log y la BD muestra un solo registro. |
+| `despues-evento-duplicado.png` | Captura visual de la prueba posterior: log de duplicado descartado y/o consulta con un solo registro. |
 | `prueba-idempotencia.txt` | Salida de build y prueba automatizada de idempotencia. |
 
 **Como reproducir mi cambio desde cero:**
