@@ -88,7 +88,7 @@ Pendiente de completar durante la implementacion si aparece una suposicion incor
 
 | Archivo | Que demuestra |
 |---|---|
-| `antes-evento-duplicado.txt` | Pendiente. |
+| `antes-evento-duplicado.txt` | Antes del cambio, el mismo evento RabbitMQ `pedido.creado.rabbitmq` llega dos veces al consumidor y se registra dos veces en logs. |
 | `despues-evento-duplicado.txt` | Pendiente. |
 
 **Como reproducir mi cambio desde cero:**
