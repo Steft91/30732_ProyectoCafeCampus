@@ -5,7 +5,8 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "build": "nest build",
-        "seed": "prisma generate --schema src/prisma/schema.prisma && ts-node src/prisma/seed.ts"
+    "seed": "prisma generate --schema src/prisma/schema.prisma && ts-node src/prisma/seed.ts",
+    "test:idempotencia": "ts-node src/modules/eventos/pedidos-rabbitmq.service.spec.ts"
   },
   "prisma": {
     "seed": "prisma generate --schema src/prisma/schema.prisma && ts-node src/prisma/seed.ts"
