@@ -1,102 +1,104 @@
-# Bitacora - Examen Final
+# Bitácora - Examen Final
 
-## 0. Identificacion
+## 0. Identificación
 
 | | |
 |---|---|
-| **Nombre** | Stefany Diaz |
+| **Nombre** | Stefany Díaz |
 | **Usuario GitHub** | @Steft91 |
 | **Grupo / Proyecto** | Grupo 3 - CafeCampus |
-| **Actividad asignada** | C - Consumidor asincrono idempotente |
+| **Actividad asignada** | C - Consumidor asíncrono idempotente |
 | **Rama** | `exam/Steft91` |
 | **Tag** | `examen-Steft91` |
 | **Pull Request** | Pendiente |
-| **Tarjeta Kanban** | Pendiente |
+| **Tarjeta Kanban** | En progreso. Evidencia inicial: `kanban-actividad-proceso.png`. |
 | **Hiciste el Paso 0?** | No aplica. La actividad C no tiene Paso 0; el repositorio ya publica eventos RabbitMQ desde Pedidos hacia Inventario. |
 
 ---
 
-## 1. Que construí
+## 1. Qué construí
 
-Endureci el consumidor RabbitMQ existente de Inventario para que el evento `pedido.creado.rabbitmq` sea procesado de forma idempotente, es decir que si se envia 2 veces el mismo evento, se descarta el duplicado. Ahora el evento viaja con una `idempotencyKey`, el consumidor persiste la clave en PostgreSQL y un duplicado se descarta con log controlado en vez de volver a producir efecto. Tambien agregue validacion de payload para descartar eventos inválidos sin tumbar el servicio y una prueba automatizada que cubre duplicados, eventos distintos y carga inválida.
+Endurecí el consumidor RabbitMQ existente de Inventario para que el evento `pedido.creado.rabbitmq` sea procesado de forma idempotente, es decir, que si se envía dos veces el mismo evento, se descarta el duplicado. Ahora el evento viaja con una `idempotencyKey`, el consumidor persiste la clave en PostgreSQL y un duplicado se descarta con log controlado en vez de volver a producir efecto. También agregué validación de payload para descartar eventos inválidos sin tumbar el servicio y una prueba automatizada que cubre duplicados, eventos distintos y carga inválida.
 
 ---
 
 ## 2. Anclaje con el repositorio de mi grupo - obligatorio (C2)
 
-| Código preexistente | Archivo:línea | Como me conecto con el |
+| Código preexistente | Archivo:línea | Cómo me conecto con él |
 |---|---|---|
 | Publisher RabbitMQ de pedido creado | `ms-pedidos/src/modules/pedidos/services/pedidos.service.ts:184` | Uso el cliente RabbitMQ existente y mantengo el mismo evento `pedido.creado.rabbitmq`; solo agrego `idempotencyKey` al payload. |
-| Patron de evento consumido por Inventario | `ms-inventario/src/modules/eventos/pedidos-rabbitmq.controller.ts:12` | Mantengo el `@EventPattern('pedido.creado.rabbitmq')` existente y delego el procesamiento idempotente al servicio nuevo. |
-| Modulo de eventos de Inventario | `ms-inventario/src/modules/eventos/eventos.module.ts:6` | Registro el servicio de idempotencia dentro del modulo existente de eventos. |
-| Persistencia de Inventario con Prisma | `ms-inventario/src/prisma/schema.prisma:40` | Agrego el modelo `EventoProcesado` en el schema de Inventario para guardar claves procesadas. |
+| Patrón de evento consumido por Inventario | `ms-inventario/src/modules/eventos/pedidos-rabbitmq.controller.ts:12` | Mantengo el `@EventPattern('pedido.creado.rabbitmq')` existente y delego el procesamiento idempotente al servicio nuevo. |
+| Módulo de eventos de Inventario | `ms-inventario/src/modules/eventos/eventos.module.ts:6` | Registro el servicio de idempotencia dentro del módulo existente de eventos. |
+| Persistencia de Inventario con Prisma | `ms-inventario/src/prisma/schema.prisma:40` | Agrego el modelo `EventoProcesado` en el esquema de Inventario para guardar claves procesadas. |
 
-**Que convencion del repositorio segui para que mi codigo no desentone?**
+**Qué convención del repositorio seguí para que mi código no desentone?**
 
-Segui la estructura NestJS que ya usa el repo: `controller` delgado, servicio inyectable con la lógica, registro en el módulo correspondiente y Prisma para persistencia. Tambien use `Logger` de NestJS, migraciones Prisma versionadas y nombres alineados con el dominio (`PedidosRabbitmqService`, `EventoProcesado`, `pedido.creado.rabbitmq`).
+Seguí la estructura NestJS que ya usa el repo: `controller` delgado, servicio inyectable con la lógica, registro en el módulo correspondiente y Prisma para persistencia. También usé `Logger` de NestJS, migraciones Prisma versionadas y nombres alineados con el dominio (`PedidosRabbitmqService`, `EventoProcesado`, `pedido.creado.rabbitmq`).
 
-**Que NO duplique, pudiendo hacerlo?**
+**Qué NO dupliqué, pudiendo hacerlo?**
 
-No cree un consumidor nuevo, una cola nueva ni un evento alterno. Tampoco moví la idempotencia al publisher: el publisher solo envia una clave única y el consumidor decide si procesa o descarta.
+No creé un consumidor nuevo, una cola nueva ni un evento alterno. Tampoco moví la idempotencia al publisher: el publisher solo envía una clave única y el consumidor decide si procesa o descarta.
 
 ---
 
-## 3. Decisiónes técnicas
+## 3. Decisiones técnicas
 
 ### Decisión 1
-- **Que decidí:** Guardar las claves procesadas en PostgreSQL, en `inventario_schema.eventos_procesados`, con `clave` única.
-- **Alternativa que descarte:** Guardarlas en memoria dentro del proceso de `ms-inventario`.
-- **Por que:** La memoria se pierde al reiniciar y no sirve si hay mas de una instancia del consumidor. PostgreSQL ya era parte del microservicio y la restriccion unica permite descartar duplicados incluso si llegan muy cerca en el tiempo. Ademas, la persistencia permite hacer pruebas de duplicados sin tener que levantar RabbitMQ.
+- **Qué decidí:** Guardar las claves procesadas en PostgreSQL, en `inventario_schema.eventos_procesados`, con `clave` única.
+- **Alternativa que descarté:** Guardarlas en memoria dentro del proceso de `ms-inventario`.
+- **Por qué:** La memoria se pierde al reiniciar y no sirve si hay más de una instancia del consumidor. PostgreSQL ya era parte del microservicio y la restricción única permite descartar duplicados incluso si llegan muy cerca en el tiempo. Además, la persistencia permite hacer pruebas de duplicados sin tener que levantar RabbitMQ.
 
 ### Decisión 2
-- **Que decidí:** Crear `PedidosRabbitmqService` y dejar el controller solo como adaptador del `@EventPattern`.
-- **Alternativa que descarte:** Meter validación, persistencia y manejo de duplicados directamente en `PedidosRabbitmqController`.
-- **Por que:** El repo ya separa responsabilidades con servicios inyectables. Así la lógica se puede probar sin levantar RabbitMQ y el controller sigue siendo pequeño. 
+- **Qué decidí:** Crear `PedidosRabbitmqService` y dejar el controller solo como adaptador del `@EventPattern`.
+- **Alternativa que descarté:** Meter validación, persistencia y manejo de duplicados directamente en `PedidosRabbitmqController`.
+- **Por qué:** El repo ya separa responsabilidades con servicios inyectables. Así la lógica se puede probar sin levantar RabbitMQ y el controller sigue siendo pequeño.
 
 ---
 
 ## 4. Las 3 preguntas de mi actividad
 
-**Pregunta 1:** Por que la garantia "al menos una vez" obliga a que la idempotencia viva en el consumidor y no en el publisher?
+**Pregunta 1:** Por qué la garantía "al menos una vez" obliga a que la idempotencia viva en el consumidor y no en el publisher?
 
-> Porque el publisher no controla cuantas veces el broker entregara el mensaje. En RabbitMQ puede haber reintentos, reconexiones o confirmaciones perdidas, y el mismo evento puede llegar más de una vez (lo que podría causar efectos duplicados, como descontar inventario dos veces o repetir un pago) aunque el publisher lo haya emitido una sola vez. En mi implementacion, `ms-pedidos` agrega `idempotencyKey`, pero `ms-inventario` es quien consulta/persiste esa clave y decide si procesa o descarta. Esa Decisión debe estar cerca del efecto para proteger el estado real del consumidor.
+> Porque el publisher no controla cuántas veces el broker entregará el mensaje. En RabbitMQ puede haber reintentos, reconexiones o confirmaciones perdidas, y el mismo evento puede llegar más de una vez (lo que podría causar efectos duplicados, como descontar inventario dos veces o repetir un pago) aunque el publisher lo haya emitido una sola vez. En mi implementación, `ms-pedidos` agrega `idempotencyKey`, pero `ms-inventario` es quien consulta/persiste esa clave y decide si procesa o descarta. Esa decisión debe estar cerca del efecto para proteger el estado real del consumidor.
 
-**Pregunta 2:** Donde guardas la clave procesada, y que ocurre si el proceso muere entre aplicar el efecto y guardar la clave? Que harias para cerrar esa ventana?
+**Pregunta 2:** Dónde guardas la clave procesada, y qué ocurre si el proceso muere entre aplicar el efecto y guardar la clave? Qué harías para cerrar esa ventana?
 
-> Guardo la clave en PostgreSQL, en `inventario_schema.eventos_procesados`, mediante el modelo `EventoProcesado`. En esta version el efecto auditable es el registro de procesamiento, por lo que la insercion con `clave` única es atómica. Si mañana el consumidor tambien descontara stock o enviara notificaciones, morir entre aplicar ese efecto y guardar la clave podría permitir duplicados al reintentar. Para cerrar esa ventana usaria una transaccion que guarde la clave y aplique el efecto de negocio juntos y si no se puede en la misma base, usaria un patron inbox/outbox con confirmacion posterior.
+> Guardo la clave en PostgreSQL, en `inventario_schema.eventos_procesados`, mediante el modelo `EventoProcesado`. En esta versión el efecto auditable es el registro de procesamiento, por lo que la inserción con `clave` única es atómica. Si mañana el consumidor también descontara stock o enviara notificaciones, morir entre aplicar ese efecto y guardar la clave podría permitir duplicados al reintentar. Para cerrar esa ventana usaría una transacción que guarde la clave y aplique el efecto de negocio juntos; si no se puede en la misma base, usaría un patrón inbox/outbox con confirmación posterior.
 
-**Pregunta 3:** Que diferencia hay entre reintentar un mensaje y mandarlo a una cola de mensajes muertos (DLQ)? Cuando conviene cada uno?
+**Pregunta 3:** Qué diferencia hay entre reintentar un mensaje y mandarlo a una cola de mensajes muertos (DLQ)? Cuándo conviene cada uno?
 
-> Reintentar sirve cuando el error puede ser temporal: base de datos momentaneamente caida, red lenta o servicio no disponible. Una DLQ sirve cuando el mensaje ya no deberia bloquear la cola principal: payload inválido, error repetido después de agotar reintentos o dato que requiere revision manual. En este cambio, un duplicado no se reintenta ni va a DLQ porque no es un fallo: se descarta de forma controlada. Un payload inválido se descarta con log para no tumbar el consumidor.
+> Reintentar sirve cuando el error puede ser temporal: base de datos momentáneamente caída, red lenta o servicio no disponible. Una DLQ sirve cuando el mensaje ya no debería bloquear la cola principal: payload inválido, error repetido después de agotar reintentos o dato que requiere revisión manual. En este cambio, un duplicado no se reintenta ni va a DLQ porque no es un fallo: se descarta de forma controlada. Un payload inválido se descarta con log para no tumbar el consumidor.
 
 ---
 
 ## 5. Uso de Inteligencia Artificial - obligatorio
 
-**Usaste IA en este examen?** Si
+**Usaste IA en este examen?** Sí
 
-| # | Que le pedi | Que me devolvio | Que corregi, adapte o descarte - y por que |
+| # | Qué le pedí | Qué me devolvió | Qué corregí, adapté o descarté - y por qué |
 |:--:|---|---|---|
-| 1 | Analizar la asignacion para identificar mi actividad exacta. | Identifico que me corresponde la actividad C y propuso trabajar sobre `pedido.creado.rabbitmq`. | Acepte el anclaje porque existe en el repo; descarte tocar actividades D o E porque pertenecen a otros integrantes. |
-| 2 | Ayudarme a implementar idempotencia sin romper el flujo existente. | Propuso agregar `idempotencyKey`, persistir claves procesadas y separar la logica en un servicio probado. | Lo adapte al stack real del repo: NestJS, Prisma, RabbitMQ existente y `docker-compose.final.yml`. |
+| 1 | Analizar la asignación para identificar mi actividad exacta. | Identificó que me corresponde la actividad C y propuso trabajar sobre `pedido.creado.rabbitmq`. | Acepté el anclaje porque existe en el repo; descarté tocar actividades D o E porque pertenecen a otros integrantes. |
+| 2 | Ayudarme a implementar idempotencia sin romper el flujo existente. | Propuso agregar `idempotencyKey`, persistir claves procesadas y separar la lógica en un servicio probado. | Lo adapté al stack real del repo: NestJS, Prisma, RabbitMQ existente y `docker-compose.final.yml`. |
+| 3 | Ayudarme a estructurar correctamente la bitácora para que cubra lo que pide la plantilla. | Me devolvió una estructura base con secciones de anclaje, decisiones, evidencia, prueba y estado final. | La corregí y la adapté a mi forma de explicar el trabajo, agregando lo que realmente hice, las evidencias que tomé y mis propias respuestas sobre idempotencia. |
 
-**En que se equivoco respecto a mi repositorio?**
+**En qué se equivocó respecto a mi repositorio?**
 
-La principal correccion fue no afirmar que antes ya existia un efecto duplicado en base de datos. Al revisar el consumer real vi que `PedidosRabbitmqController` solo registraba logs, asi que use logs como evidencia previa y cree la persistencia de claves como parte de mi cambio. Tambien evite tocar actividades de mis compañeros aunque habia codigo de Sentry/JWT en el proyecto.
+La principal corrección fue no afirmar que antes ya existía un efecto duplicado en base de datos. Al revisar el consumer real vi que `PedidosRabbitmqController` solo registraba logs, así que usé logs como evidencia previa y creé la persistencia de claves como parte de mi cambio. También evité tocar actividades de mis compañeros aunque había código de Sentry/JWT en el proyecto.
 
 ---
 
 ## 6. Evidencia
 
-| Archivo | Que demuestra |
+| Archivo | Qué demuestra |
 |---|---|
 | `antes-evento-duplicado.txt` | Antes del cambio, el mismo evento RabbitMQ `pedido.creado.rabbitmq` llega dos veces al consumidor y se registra dos veces en logs. |
 | `antes-evento-duplicado.png` | Captura visual del mismo comportamiento previo: dos logs para el mismo `pedidoId`. |
-| `despues-evento-duplicado.txt` | Despues del cambio, el mismo evento se procesa una vez, el duplicado se descarta con log y la BD muestra un solo registro. |
+| `despues-evento-duplicado.txt` | Después del cambio, el mismo evento se procesa una vez, el duplicado se descarta con log y la BD muestra un solo registro. |
 | `despues-evento-duplicado.png` | Captura visual de la prueba posterior: log de duplicado descartado y/o consulta con un solo registro. |
 | `prueba-idempotencia.txt` | Salida de build y prueba automatizada de idempotencia. |
+| `kanban-actividad-proceso.png` | Captura de mi tarjeta Kanban de la actividad C en progreso. |
 
-**Como reproducir mi cambio desde cero:**
+**Cómo reproducir mi cambio desde cero:**
 
 ```bash
 git switch exam/Steft91
@@ -118,8 +120,8 @@ docker compose -f docker-compose.final.yml exec -T postgres psql -U postgres -d 
 |---|---|
 | **Archivo de la prueba** | `ms-inventario/src/modules/eventos/pedidos-rabbitmq.service.spec.ts` |
 | **Comando para ejecutarla** | `docker compose -f docker-compose.final.yml exec -T ms-inventario npm run test:idempotencia` |
-| **Que verifica** | Evento duplicado deja un registro; eventos distintos dejan dos; payload invalido se descarta. |
-| **Falla sin mi cambio?** | Si. Sin el servicio de idempotencia y la persistencia de claves no existe el comportamiento `duplicado` ni el registro unico. |
+| **Qué verifica** | Evento duplicado deja un registro; eventos distintos dejan dos; payload inválido se descarta. |
+| **Falla sin mi cambio?** | Sí. Sin el servicio de idempotencia y la persistencia de claves no existe el comportamiento `duplicado` ni el registro único. |
 
 Salida de la prueba pasando:
 
@@ -132,25 +134,25 @@ OK - idempotencia RabbitMQ validada
 ## 8. Estado final - honesto
 
 **Funciona:**
-- El publisher RabbitMQ de `ms-pedidos` envia `idempotencyKey`.
+- El publisher RabbitMQ de `ms-pedidos` envía `idempotencyKey`.
 - El consumer de `ms-inventario` persiste la clave procesada.
 - El mismo evento duplicado queda con un solo registro en BD y el duplicado se descarta con log.
 - Dos eventos distintos se procesan como registros distintos.
-- Un payload invalido se descarta sin tumbar el proceso.
+- Un payload inválido se descarta sin tumbar el proceso.
 - La prueba automatizada `test:idempotencia` pasa.
 
 **No funciona / quedo incompleto:**
-- La parte tecnica de la actividad C esta completa segun las pruebas realizadas. Quedan pendientes los pasos administrativos finales: abrir PR, enlazar tarjeta Kanban, completar esos enlaces en esta bitacora y crear/subir el tag.
+- La parte técnica de la actividad C está completa según las pruebas realizadas. Quedan pendientes los pasos administrativos finales: abrir PR, enlazar tarjeta Kanban, completar esos enlaces en esta bitácora y crear/subir el tag.
 
-**Cual era mi siguiente paso:**
+**Cuál era mi siguiente paso:**
 
-Abrir el Pull Request de `exam/Steft91` hacia `main`, mover mi tarjeta Kanban a Hecho con enlace al PR, actualizar esta bitacora con esos enlaces y publicar el tag `examen-Steft91`.
+Abrir el Pull Request de `exam/Steft91` hacia `main`, mover mi tarjeta Kanban a Hecho con enlace al PR, actualizar esta bitácora con esos enlaces y publicar el tag `examen-Steft91`.
 
 ---
 
-## 9. Declaracion
+## 9. Declaración
 
-Declaro que este trabajo es individual, que corresponde a la actividad que me fue asignada, y que la seccion 5 refleja de forma completa y veraz el uso que hice de herramientas de Inteligencia Artificial durante el examen.
+Declaro que este trabajo es individual, que corresponde a la actividad que me fue asignada, y que la sección 5 refleja de forma completa y veraz el uso que hice de herramientas de Inteligencia Artificial durante el examen.
 
-**Nombre:** Stefany Diaz
+**Nombre:** Stefany Díaz
 **Fecha:** 2026-07-27
