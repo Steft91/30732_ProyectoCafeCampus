@@ -16,7 +16,7 @@
 | **Actividad asignada** | **E** - Filtro de excepciones y códigos |
 | **Rama** | `exam/matsosa1` |
 | **Tag** | `examen-matsosa1` |
-| **Pull Request** | *(enlace)* |
+| **Pull Request** | https://github.com/Steft91/30732_ProyectoCafeCampus/pull/28 |
 | **Tarjeta Kanban** | [https://github.com/Steft91/30732_ProyectoCafeCampus/issues/22](https://github.com/Steft91/30732_ProyectoCafeCampus/issues/22) |
 | **¿Hiciste el Paso 0?** | No |
 
