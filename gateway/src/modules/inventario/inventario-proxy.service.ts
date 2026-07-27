@@ -40,7 +40,7 @@ export class InventarioProxyService {
       const status = axiosError.response?.status ?? HttpStatus.INTERNAL_SERVER_ERROR;
       const message = (axiosError.response?.data as any)?.message ?? 'Error en MS Inventario';
 
-      throw new HttpException(message, status);  // Excepción con código obtenido de axios.status
+      throw new HttpException(message, 404);  // Excepción con código obtenido de axios.status
     }
   }
 }
