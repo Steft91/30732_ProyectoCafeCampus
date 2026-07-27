@@ -1,5 +1,6 @@
-import { Controller, Logger } from '@nestjs/common';
+import { Controller, Logger, UseFilters } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
+import { RpcExceptionFilter } from '../../common/filters/rpc-exception.filter';
 
 type PedidoCreadoAsyncEvent = {
   pedidoId: string;
@@ -9,6 +10,7 @@ type PedidoCreadoAsyncEvent = {
 };
 
 @Controller()
+@UseFilters(new RpcExceptionFilter('redis', 'BenchmarkEventsController.handlePedidoCreado'))
 export class BenchmarkEventsController {
   private readonly logger = new Logger(BenchmarkEventsController.name);
 

@@ -1,5 +1,6 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseFilters } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
+import { RpcExceptionFilter } from '../../common/filters/rpc-exception.filter';
 
 type BenchmarkPayload = {
   productoId: string;
@@ -7,6 +8,7 @@ type BenchmarkPayload = {
 };
 
 @Controller()
+@UseFilters(new RpcExceptionFilter('tcp', 'BenchmarkTcpController.checkStock'))
 export class BenchmarkTcpController {
   @MessagePattern('benchmark.stock-check')
   async checkStock(@Payload() payload: BenchmarkPayload) {
