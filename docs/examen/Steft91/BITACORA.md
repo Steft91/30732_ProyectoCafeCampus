@@ -143,11 +143,11 @@ OK - idempotencia RabbitMQ validada
 - La prueba automatizada `test:idempotencia` pasa.
 
 **No funciona / quedo incompleto:**
-- La parte técnica de la actividad C está completa según las pruebas realizadas. Al momento de este cierre queda pendiente crear y subir el tag `examen-Steft91`.
+- La parte técnica de la actividad C está completa según las pruebas realizadas. El PR quedó abierto, la tarjeta Kanban quedó en Hecho y el tag `examen-Steft91` fue creado y subido al remoto.
 
 **Cuál era mi siguiente paso:**
 
-Crear y subir el tag `examen-Steft91` apuntando al último commit de la rama.
+Subir el enlace del Pull Request a Moodle, que es el único paso externo al repositorio.
 
 ---
 
